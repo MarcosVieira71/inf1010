@@ -15,9 +15,8 @@ FILE* open(char* filepath);
 Patient* insertPatient(Patient* head, Patient* p);
 Patient* createPatient(int arrival, char* color);
 Patient* removePatient(Patient* head, int arrival);
-int searchByColor(char* color, Patient* head);
 void showPatients(Patient* head);
-
+void freePatients(Patient** head);
 
 int main(void) {
 	FILE* file = open("arquivo.txt");
@@ -25,23 +24,26 @@ int main(void) {
 	char tempStr[10];
 	char opType;
 	Patient* head = NULL;
-	while (fscanf(file, " %c %d %[^\n]",&opType, &tempInt, tempStr) == 3) {
+	while (fscanf(file, " %c %d %[^\n]",&opType, &tempInt, tempStr) == 3) {	
 		if (opType == 'E') {
 			Patient* p = createPatient(tempInt, tempStr);
 			head = insertPatient(head, p);
-			printf("Inserindo paciente na lista\n");
+			printf("Inserindo paciente '%s de chegada %d' na lista\n", p->color, p->arrival);
 		}
 		else if(opType =='S'){
 			head = removePatient(head, tempInt);
-			printf("Removendo paciente da lista\n");
+			printf("Removendo paciente de chegada %d da lista\n", tempInt);
 		}
 		showPatients(head);
 		printf("-----------------\n");
 	}
+	freePatients(&head);
+	printf("Esvaziando lista de pacientes\n");
+	//showPatients(head);
 	return 0;
 }
 
-
+//Gera um ponteiro para uma estrutura Paciente 
 Patient* createPatient(int arrival, char* color) {
 	Patient* newPatient = (Patient*)malloc(sizeof(Patient));
 	if (newPatient == NULL) return NULL;
@@ -51,13 +53,7 @@ Patient* createPatient(int arrival, char* color) {
 	return newPatient;
 }
 
-int searchByColor(char* color, Patient* head) {
-	for (Patient* i = head; i != NULL; i = i->next) {
-		if (!strcmp(i->color, color)) return 1;
-	}
-	return 0;
-}
-
+//Função para retornar o ponteiro para o arquivo. Em caso de erro, o programa é encerrado
 FILE* open(char* filepath) {
 	FILE* p = fopen(filepath, "r");
 	if (p == NULL) {
@@ -67,12 +63,14 @@ FILE* open(char* filepath) {
 	return p;
 }
 
+//Função para a exibição de todos os nós Pacientes da lista
 void showPatients(Patient* head) {
 	for (Patient* i = head; i != NULL; i = i->next) {
 		printf("%d %s\n", i->arrival, i->color);
 	}
 }
 
+//Função para a remoção de um paciente específico da lista
 Patient* removePatient(Patient* head, int arrival)
 {
  	Patient* prev = NULL;
@@ -95,18 +93,20 @@ Patient* removePatient(Patient* head, int arrival)
     return head;
 }
 
+//Inserção de um paciente na lista de forma ordenada. 
 Patient* insertPatient(Patient* head, Patient* p) {
 	Patient* cur = head;
 	Patient* prev = NULL;
 
 	for (cur; cur != NULL; cur = cur->next) {
-		if (p->color[0] == 'r' &&(cur->color[0] == 'y' || cur->color[0] == 'g')) {
+		// Se a cor do paciente for vermelha, ele deve ser inserido antes de qualquer paciente amarelo ou verde.
+		if (p->color[0] == 'r' && (cur->color[0] == 'y' || cur->color[0] == 'g')) {
 			break;
 		}
+		// Se a cor do paciente for amarela, ele deve ser inserido antes de qualquer paciente verde.
 		else if (p->color[0] == 'y' && cur->color[0] == 'g') {
 			break;
 		}
-		
 		prev = cur;
 	}
 
@@ -120,4 +120,14 @@ Patient* insertPatient(Patient* head, Patient* p) {
 	}
 
 	return head;
+}
+
+//Libera por completo a lista de pacientes
+void freePatients(Patient** head){
+	while(*head){
+		Patient* temp = head;
+		*head = (*head)->next;
+		free(temp);
+	}
+	*head = NULL;
 }
