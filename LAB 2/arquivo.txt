@@ -10,8 +10,3 @@ S 3 red
 S 5 red
 S 1 green
 S 2 yellow
-E 9 red
-E 10 yellow
-E 11 green
-E 12 red
-E 13 green

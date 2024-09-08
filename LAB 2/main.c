@@ -23,13 +23,17 @@ Patient* removePatient(Patient* head, int arrival)
     Patient* cur = head;
 
     for (;cur != NULL; cur=cur->next) {
-        if(cur->arrival == arrival) break;
+		if(cur->arrival == arrival)break;
 		prev = cur;
     }
-
     if (cur) {
-        prev->next = cur->next;
-        free(cur);
+		if (prev) {
+        	prev->next = cur->next;
+			free(cur);
+		}
+		else {
+			head = cur->next;
+		}
     }
 
     return head;
@@ -76,8 +80,7 @@ int main(void) {
 			printf("Inserindo paciente na lista\n");
 		}
 		else if(opType =='S'){
-			printf("oi");
-			head = removePatient(head, 1);
+			head = removePatient(head, tempInt);
 			printf("Removendo paciente da lista\n");
 		}
 		showPatients(head);
