@@ -12,59 +12,11 @@ struct patient {
 };
 
 FILE* open(char* filepath);
-//void insertPatient(Patient* head, Patient* p);
+Patient* insertPatient(Patient* head, Patient* p);
 Patient* createPatient(int arrival, char* color);
+Patient* removePatient(Patient* head, int arrival);
 int searchByColor(char* color, Patient* head);
 void showPatients(Patient* head);
-
-Patient* removePatient(Patient* head, int arrival)
-{
- 	Patient* prev = NULL;
-    Patient* cur = head;
-
-    for (;cur != NULL; cur=cur->next) {
-		if(cur->arrival == arrival)break;
-		prev = cur;
-    }
-    if (cur) {
-		if (prev) {
-        	prev->next = cur->next;
-			free(cur);
-		}
-		else {
-			head = cur->next;
-		}
-    }
-
-    return head;
-}
-
-Patient* insertPatient(Patient* head, Patient* p) {
-	Patient* cur = head;
-	Patient* prev = NULL;
-
-	for (cur; cur != NULL; cur = cur->next) {
-		if (p->color[0] == 'r' &&(cur->color[0] == 'y' || cur->color[0] == 'g')) {
-			break;
-		}
-		else if (p->color[0] == 'y' && cur->color[0] == 'g') {
-			break;
-		}
-		
-		prev = cur;
-	}
-
-	p->next = cur;
-
-	if (prev) {
-		prev->next = p;
-	}
-	else {
-		head = p;
-	}
-
-	return head;
-}
 
 
 int main(void) {
@@ -119,4 +71,53 @@ void showPatients(Patient* head) {
 	for (Patient* i = head; i != NULL; i = i->next) {
 		printf("%d %s\n", i->arrival, i->color);
 	}
+}
+
+Patient* removePatient(Patient* head, int arrival)
+{
+ 	Patient* prev = NULL;
+    Patient* cur = head;
+
+    for (;cur != NULL; cur=cur->next) {
+		if(cur->arrival == arrival)break;
+		prev = cur;
+    }
+    if (cur) {
+		if (prev) {
+        	prev->next = cur->next;
+			free(cur);
+		}
+		else {
+			head = cur->next;
+		}
+    }
+
+    return head;
+}
+
+Patient* insertPatient(Patient* head, Patient* p) {
+	Patient* cur = head;
+	Patient* prev = NULL;
+
+	for (cur; cur != NULL; cur = cur->next) {
+		if (p->color[0] == 'r' &&(cur->color[0] == 'y' || cur->color[0] == 'g')) {
+			break;
+		}
+		else if (p->color[0] == 'y' && cur->color[0] == 'g') {
+			break;
+		}
+		
+		prev = cur;
+	}
+
+	p->next = cur;
+
+	if (prev) {
+		prev->next = p;
+	}
+	else {
+		head = p;
+	}
+
+	return head;
 }
