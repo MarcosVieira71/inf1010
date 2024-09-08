@@ -1,3 +1,13 @@
-1 red 
-2 green
+1 green
+2 yellow
 3 red
+4 green
+5 red
+6 green
+7 yellow
+8 red
+9 green
+10 green
+11 yellow
+12 red
+
