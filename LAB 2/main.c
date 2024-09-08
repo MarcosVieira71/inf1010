@@ -17,13 +17,13 @@ Patient* createPatient(int arrival, char* color);
 int searchByColor(char* color, Patient* head);
 void showPatients(Patient* head);
 
-Patient* removePatient(Patient* head, Patient* p)
+Patient* removePatient(Patient* head, int arrival)
 {
  	Patient* prev = NULL;
     Patient* cur = head;
 
     for (;cur != NULL; cur=cur->next) {
-        if(cur->arrival == p->arrival) break;;
+        if(cur->arrival == arrival) break;
 		prev = cur;
     }
 
@@ -67,17 +67,22 @@ int main(void) {
 	FILE* file = open("arquivo.txt");
 	int tempInt;
 	char tempStr[10];
+	char opType;
 	Patient* head = NULL;
-	while (fscanf(file, " %d %[^\n]", &tempInt, tempStr) == 2) {
-		Patient* p = createPatient(tempInt, tempStr);
-		head = insertPatient(head, p);
-		
+	while (fscanf(file, " %c %d %[^\n]",&opType, &tempInt, tempStr) == 3) {
+		if (opType == 'E') {
+			Patient* p = createPatient(tempInt, tempStr);
+			head = insertPatient(head, p);
+			printf("Inserindo paciente na lista\n");
+		}
+		else if(opType =='S'){
+			printf("oi");
+			head = removePatient(head, 1);
+			printf("Removendo paciente da lista\n");
+		}
+		showPatients(head);
+		printf("-----------------\n");
 	}
-	Patient* p = createPatient(12, "red");
-	head = removePatient(head, p);
-
-	showPatients(head);
-
 	return 0;
 }
 

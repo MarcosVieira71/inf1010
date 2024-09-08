@@ -1,13 +1,17 @@
-1 green
-2 yellow
-3 red
-4 green
-5 red
-6 green
-7 yellow
-8 red
-9 green
-10 green
-11 yellow
-12 red
-
+E 1 green
+E 2 yellow
+E 3 red
+E 4 green
+E 5 red
+E 6 green
+E 7 yellow
+E 8 red
+S 3 red
+S 5 red
+S 1 green
+S 2 yellow
+E 9 red
+E 10 yellow
+E 11 green
+E 12 red
+E 13 green
