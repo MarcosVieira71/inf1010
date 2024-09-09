@@ -125,7 +125,7 @@ Patient* insertPatient(Patient* head, Patient* p) {
 //Libera por completo a lista de pacientes
 void freePatients(Patient** head){
 	while(*head){
-		Patient* temp = head;
+		Patient* temp = (*head);
 		*head = (*head)->next;
 		free(temp);
 	}
