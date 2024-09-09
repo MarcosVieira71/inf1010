@@ -83,11 +83,11 @@ Patient* removePatient(Patient* head, int arrival)
     if (cur) {
 		if (prev) {
         	prev->next = cur->next;
-			free(cur);
 		}
 		else {
 			head = cur->next;
 		}
+		free(cur);
     }
 
     return head;
