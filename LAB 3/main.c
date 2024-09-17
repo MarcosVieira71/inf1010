@@ -89,7 +89,7 @@ void exibeArvore(Arvore *raiz)
 		return;
 	}
 
-	exibeArvore(raiz->esq);
 	printf("%d\n", raiz->chave);
+	exibeArvore(raiz->esq);
 	exibeArvore(raiz->dir);
 }
