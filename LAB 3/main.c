@@ -54,7 +54,6 @@ void insereArvoreNivel(Arvore **raiz, int chave)
 			if (!arvAtual->esq)
 			{
 				arvAtual->esq = criaArvore(arvAtual, chave);
-                atualizaAltura(arvAtual->esq); // Atualiza as alturas
 				break;
 			}
 			else
@@ -66,7 +65,6 @@ void insereArvoreNivel(Arvore **raiz, int chave)
 			if (!arvAtual->dir)
 			{
 				arvAtual->dir = criaArvore(arvAtual, chave);
-                atualizaAltura(arvAtual->dir); // Atualiza as alturas
 				break;
 			}
 			else
@@ -76,6 +74,7 @@ void insereArvoreNivel(Arvore **raiz, int chave)
 			}
 		}
 		free(fila);
+        atualizaAltura(*raiz); // Atualiza as alturas
 	}
 }
 
@@ -116,11 +115,12 @@ void liberaArvore(Arvore* raiz)
 
 void atualizaAltura(Arvore *raiz)
 {
-    while (raiz != NULL)
-    {
-        int altEsq = raiz->esq ? raiz->esq->altura + 1 : 0;
-        int altDir = raiz->dir ? raiz->dir->altura + 1 : 0;
-        raiz->altura = (altEsq > altDir) ? altEsq : altDir;
-        raiz = raiz->pai;
-    }
+    if (raiz == NULL)
+        return;
+    atualizaAltura(raiz->esq);
+    atualizaAltura(raiz->dir);
+
+    int altEsq = raiz->esq ? raiz->esq->altura + 1 : 0;
+    int altDir = raiz->dir ? raiz->dir->altura + 1 : 0;
+    raiz->altura = (altEsq > altDir) ? altEsq : altDir;
 }
