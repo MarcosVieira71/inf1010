@@ -28,6 +28,7 @@ int main(void){
     contaSubNos(raiz);
     if(verificaAbb(raiz)) printf("\n É ABB!\n");
     exibeArvore(raiz);
+    liberaArvore(raiz);
 }
 
 void exibeArvore(Node* raiz){
