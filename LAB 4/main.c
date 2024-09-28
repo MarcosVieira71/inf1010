@@ -66,8 +66,8 @@ int verificaAbb(Node* raiz){
     if(!raiz) return 0;
     int numNos = contaSubNos(raiz);
 
-    int arr[numNos];
-
+    int* arr = (int*)malloc(sizeof(int) * numNos);
+    
     int index = 0;
 
     preencheVetor(raiz, arr, &index);
@@ -77,6 +77,7 @@ int verificaAbb(Node* raiz){
             return 0;
         }
     }
+    free(arr);
     return 1;
 }
 
