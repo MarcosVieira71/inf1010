@@ -60,6 +60,7 @@ Node* criaNo(int chave){
     newNode->dir = NULL;
     newNode->esq = NULL;
     newNode->numSub = 0;
+    return newNode;
 }
 
 int verificaAbb(Node* raiz){
@@ -71,9 +72,10 @@ int verificaAbb(Node* raiz){
     int index = 0;
 
     preencheVetor(raiz, arr, &index);
-    for(int i = 0; i < numNos; i++){
+    for(int i = 0; i < numNos - 1; i++){
         printf("%d ", arr[i]);
         if(arr[i] > arr[i+1]){
+            free(arr);
             return 0;
         }
     }
