@@ -25,9 +25,12 @@ int main(void){
     for(int i = 0; i < 10; i++){
         raiz = insereNo(raiz, arr[i]);
     }
-    contaSubNos(raiz);
-    if(verificaAbb(raiz)) printf("\n É ABB!\n");
+    printf("\nExibicao antes da contagem de sub-nos\n");
     exibeArvore(raiz);
+    contaSubNos(raiz);
+    printf("\nExibicao apos a contagem de sub-nos\n");
+    exibeArvore(raiz);
+    if(verificaAbb(raiz)) printf("\nABB!\n");
     liberaArvore(raiz);
 }
 
@@ -73,7 +76,6 @@ int verificaAbb(Node* raiz){
 
     preencheVetor(raiz, arr, &index);
     for(int i = 0; i < numNos - 1; i++){
-        printf("%d ", arr[i]);
         if(arr[i] > arr[i+1]){
             free(arr);
             return 0;
