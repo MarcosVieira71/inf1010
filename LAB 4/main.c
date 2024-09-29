@@ -27,42 +27,43 @@ int verificaAVL(Node *raiz);
 int main(void)
 {
     int arr[] = {15, 17, 3, 5, 2, 20, 25, 13, 10, 16};
-    Node *raiz = NULL;
+    Node *raizABB = NULL;
     Node *raizCompleta = NULL;
+    Node *raizAVL = NULL;
+
     for(int i = 0; i < 10; i++)
     {
-        raiz1 = insereNo(raiz1, arr1[i]);
+        raizABB = insereNo(raizABB, arr[i]);
         raizCompleta = insereNoNivel(raizCompleta, arr[i]);
     }
-    printf("\nArvore 1\n");
-    printf("\nExibicao antes da contagem de sub-nos\n");
-    exibeArvore(raiz1);
-    contaSubNos(raiz1);
-    printf("\nExibicao apos a contagem de sub-nos\n");
-    exibeArvore(raiz1);
-    if (verificaAbb(raiz1))
-        printf("\nABB!\n");
-    if (verificaAVL(raiz1))
-        printf("\nAVL!\n");
-    liberaArvore(raiz1);
 
     int arr2[] = {20, 10, 30, 5, 12, 23, 32};
-    Node *raiz2 = NULL;
     for (int i = 0; i < 7; i++)
     {
-        raiz2 = insereNo(raiz2, arr2[i]);
+        raizAVL = insereNo(raizAVL, arr2[i]);
     }
-    printf("\nArvore 2\n");
-    printf("\nExibicao antes da contagem de sub-nos\n");
-    exibeArvore(raiz2);
-    contaSubNos(raiz2);
-    printf("\nExibicao apos a contagem de sub-nos\n");
-    exibeArvore(raiz2);
-    if (verificaAbb(raiz2))
-        printf("\nABB!\n");
-    if (verificaAVL(raiz2))
-        printf("\nAVL!\n");
-    liberaArvore(raiz2);
+    Node* arvores[] = {raizCompleta, raizABB, raizAVL};
+
+    for(int i = 0; i < 3; i++){
+        printf("\nExibicao antes da contagem de sub-nos\n");
+        exibeArvore(arvores[i]);
+
+        printf("\n...Contando sub-nos...\n");
+        contaSubNos(arvores[i]);
+        
+        printf("\nExibicao apos a contagem de sub-nos\n");
+        exibeArvore(arvores[i]);
+
+        if(!verificaAbb(arvores[i])){
+            printf("\nNao eh ABB nem AVL!\n");
+        }
+        else{
+            if(verificaAVL(arvores[i])) printf("\nEh ABB e AVL!\n");
+            else(printf("\nEh ABB!\n"));
+        }
+        liberaArvore(arvores[i]);
+    }
+    return 0;
 }
 
 void exibeArvore(Node *raiz)
