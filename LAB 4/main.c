@@ -17,7 +17,6 @@ Node *criaNo(int chave);
 void exibeArvore(Node *raiz);
 int verificaAbb(Node *raiz);
 int contaSubNos(Node *raiz);
-int verificaAbb(Node *raiz);
 void preencheVetor(Node *raiz, int *arr, int *index);
 void liberaArvore(Node *raiz);
 int atualizaAltura(Node *raiz);
