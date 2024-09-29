@@ -54,12 +54,12 @@ int main(void)
         printf("\nExibicao apos a contagem de sub-nos\n");
         exibeArvore(arvores[i]);
 
-        if(!verificaAbb(arvores[i])){
-            printf("\nNao eh ABB nem AVL!\n");
+        if(verificaAVL(arvores[i])){
+            printf("\nEh ABB e AVL!\n");
         }
         else{
-            if(verificaAVL(arvores[i])) printf("\nEh ABB e AVL!\n");
-            else(printf("\nEh ABB!\n"));
+            if(verificaAbb(arvores[i])) printf("\nEh ABB, mas nao AVL!\n");
+            else(printf("\n Nao eh ABB e nem AVL!\n"));
         }
         liberaArvore(arvores[i]);
     }
