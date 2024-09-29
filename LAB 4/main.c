@@ -13,6 +13,7 @@ struct node
 };
 
 Node *insereNo(Node *raiz, int chave);
+Node *insereNoNivel(Node *raiz, int chave);
 Node *criaNo(int chave);
 void exibeArvore(Node *raiz);
 int verificaAbb(Node *raiz);
@@ -27,20 +28,35 @@ int main(void)
 {
     int arr[] = {15, 17, 3, 5, 2, 20, 25, 13, 10, 16};
     Node *raiz = NULL;
-    for (int i = 0; i < 10; i++)
+    Node *raizCompleta = NULL;
+    for(int i = 0; i < 10; i++)
     {
         raiz = insereNo(raiz, arr[i]);
+        raizCompleta = insereNoNivel(raizCompleta, arr[i]);
     }
-    printf("\nExibicao antes da contagem de sub-nos\n");
+
+    printf("\nExibicao antes da contagem de sub-nos - ABB\n");
     exibeArvore(raiz);
+    
     contaSubNos(raiz);
-    printf("\nExibicao apos a contagem de sub-nos\n");
+
+    printf("\nExibicao apos a contagem de sub-nos - ABB\n");
     exibeArvore(raiz);
-    if (verificaAbb(raiz))
-        printf("\nABB!\n");
-    if (verificaAVL(raiz))
-        printf("AVL\n");
+    if (verificaAbb(raiz)) printf("\nABB!\n");
+    
+
+    printf("\nExibicao antes da contagem de sub-nos - Arvore por Nivel\n");
+    exibeArvore(raizCompleta);
+
+    contaSubNos(raizCompleta);
+
+    printf("\nExibicao apos a contagem de sub-nos - Arvore por Nivel\n");
+    exibeArvore(raizCompleta);
+
+    if (!verificaAbb(raizCompleta)) printf("\nNao ABB!\n");
+
     liberaArvore(raiz);
+    liberaArvore(raizCompleta);
 }
 
 void exibeArvore(Node *raiz)
@@ -166,4 +182,39 @@ int verificaAVL(Node *raiz)
         return 0;
 
     return verificaAVL(raiz->esq) && verificaAVL(raiz->dir);
+}
+
+
+Node* insereNoNivel(Node* raiz, int val){    
+    Node* new = criaNo(val);
+    if(!raiz){
+        return new;
+    }
+    Node** queue = (Node**)malloc(sizeof(Node*) * 100);
+    int begin = 0, end = 0;
+    queue[end++] = raiz; 
+    while(begin < end){
+        
+        Node* cur = queue[begin++];
+
+        if(!cur->esq){
+            cur->esq = new;
+            break;
+        }
+        else{
+            queue[end++] = cur->esq;
+        }
+
+        if(!cur->dir){
+            cur->dir = new;
+            break;
+        }
+
+        else{
+            queue[end++] = cur->dir;
+        }
+    }
+    free(queue);
+    atualizaAltura(raiz);
+    return raiz;
 }
