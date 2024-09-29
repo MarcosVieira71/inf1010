@@ -31,32 +31,38 @@ int main(void)
     Node *raizCompleta = NULL;
     for(int i = 0; i < 10; i++)
     {
-        raiz = insereNo(raiz, arr[i]);
+        raiz1 = insereNo(raiz1, arr1[i]);
         raizCompleta = insereNoNivel(raizCompleta, arr[i]);
     }
+    printf("\nArvore 1\n");
+    printf("\nExibicao antes da contagem de sub-nos\n");
+    exibeArvore(raiz1);
+    contaSubNos(raiz1);
+    printf("\nExibicao apos a contagem de sub-nos\n");
+    exibeArvore(raiz1);
+    if (verificaAbb(raiz1))
+        printf("\nABB!\n");
+    if (verificaAVL(raiz1))
+        printf("\nAVL!\n");
+    liberaArvore(raiz1);
 
-    printf("\nExibicao antes da contagem de sub-nos - ABB\n");
-    exibeArvore(raiz);
-    
-    contaSubNos(raiz);
-
-    printf("\nExibicao apos a contagem de sub-nos - ABB\n");
-    exibeArvore(raiz);
-    if (verificaAbb(raiz)) printf("\nABB!\n");
-    
-
-    printf("\nExibicao antes da contagem de sub-nos - Arvore por Nivel\n");
-    exibeArvore(raizCompleta);
-
-    contaSubNos(raizCompleta);
-
-    printf("\nExibicao apos a contagem de sub-nos - Arvore por Nivel\n");
-    exibeArvore(raizCompleta);
-
-    if (!verificaAbb(raizCompleta)) printf("\nNao ABB!\n");
-
-    liberaArvore(raiz);
-    liberaArvore(raizCompleta);
+    int arr2[] = {20, 10, 30, 5, 12, 23, 32};
+    Node *raiz2 = NULL;
+    for (int i = 0; i < 7; i++)
+    {
+        raiz2 = insereNo(raiz2, arr2[i]);
+    }
+    printf("\nArvore 2\n");
+    printf("\nExibicao antes da contagem de sub-nos\n");
+    exibeArvore(raiz2);
+    contaSubNos(raiz2);
+    printf("\nExibicao apos a contagem de sub-nos\n");
+    exibeArvore(raiz2);
+    if (verificaAbb(raiz2))
+        printf("\nABB!\n");
+    if (verificaAVL(raiz2))
+        printf("\nAVL!\n");
+    liberaArvore(raiz2);
 }
 
 void exibeArvore(Node *raiz)
