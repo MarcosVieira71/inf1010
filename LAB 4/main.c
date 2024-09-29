@@ -31,7 +31,6 @@ int main(void)
     {
         raiz = insereNo(raiz, arr[i]);
     }
-    atualizaAltura(raiz);
     printf("\nExibicao antes da contagem de sub-nos\n");
     exibeArvore(raiz);
     contaSubNos(raiz);
@@ -68,6 +67,7 @@ Node *insereNo(Node *raiz, int chave)
     {
         raiz->dir = insereNo(raiz->dir, chave);
     }
+    atualizaAltura(raiz);
     return raiz;
 }
 
