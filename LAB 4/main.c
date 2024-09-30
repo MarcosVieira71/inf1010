@@ -4,7 +4,6 @@
 typedef struct node Node;
 struct node
 {
-    Node *pai;
     int chave;
     int numSub;
     int altura;
@@ -18,7 +17,6 @@ Node *criaNo(int chave);
 void exibeArvore(Node *raiz);
 int verificaAbb(Node *raiz);
 int contaSubNos(Node *raiz);
-int verificaAbb(Node *raiz);
 void preencheVetor(Node *raiz, int *arr, int *index);
 void liberaArvore(Node *raiz);
 int atualizaAltura(Node *raiz);
@@ -31,7 +29,7 @@ int main(void)
     Node *raizCompleta = NULL;
     Node *raizAVL = NULL;
 
-    for(int i = 0; i < 10; i++)
+    for (int i = 0; i < 10; i++)
     {
         raizABB = insereNo(raizABB, arr[i]);
         raizCompleta = insereNoNivel(raizCompleta, arr[i]);
@@ -42,24 +40,29 @@ int main(void)
     {
         raizAVL = insereNo(raizAVL, arr2[i]);
     }
-    Node* arvores[] = {raizCompleta, raizABB, raizAVL};
+    Node *arvores[] = {raizCompleta, raizABB, raizAVL};
 
-    for(int i = 0; i < 3; i++){
+    for (int i = 0; i < 3; i++)
+    {
         printf("\nExibicao antes da contagem de sub-nos\n");
         exibeArvore(arvores[i]);
 
         printf("\n...Contando sub-nos...\n");
         contaSubNos(arvores[i]);
-        
+
         printf("\nExibicao apos a contagem de sub-nos\n");
         exibeArvore(arvores[i]);
 
-        if(verificaAVL(arvores[i])){
+        if (verificaAVL(arvores[i]))
+        {
             printf("\nEh ABB e AVL!\n");
         }
-        else{
-            if(verificaAbb(arvores[i])) printf("\nEh ABB, mas nao AVL!\n");
-            else(printf("\n Nao eh ABB e nem AVL!\n"));
+        else
+        {
+            if (verificaAbb(arvores[i]))
+                printf("\nEh ABB, mas nao AVL!\n");
+            else
+                (printf("\n Nao eh ABB e nem AVL!\n"));
         }
         liberaArvore(arvores[i]);
     }
@@ -100,7 +103,6 @@ Node *criaNo(int chave)
     if (!newNode)
         exit(1);
     newNode->chave = chave;
-    newNode->pai = NULL;
     newNode->dir = NULL;
     newNode->esq = NULL;
     newNode->numSub = 0;
@@ -191,33 +193,39 @@ int verificaAVL(Node *raiz)
     return verificaAVL(raiz->esq) && verificaAVL(raiz->dir);
 }
 
-
-Node* insereNoNivel(Node* raiz, int val){    
-    Node* new = criaNo(val);
-    if(!raiz){
+Node *insereNoNivel(Node *raiz, int val)
+{
+    Node *new = criaNo(val);
+    if (!raiz)
+    {
         return new;
     }
-    Node** queue = (Node**)malloc(sizeof(Node*) * 100);
+    Node **queue = (Node **)malloc(sizeof(Node *) * 100);
     int begin = 0, end = 0;
-    queue[end++] = raiz; 
-    while(begin < end){
-        
-        Node* cur = queue[begin++];
+    queue[end++] = raiz;
+    while (begin < end)
+    {
 
-        if(!cur->esq){
+        Node *cur = queue[begin++];
+
+        if (!cur->esq)
+        {
             cur->esq = new;
             break;
         }
-        else{
+        else
+        {
             queue[end++] = cur->esq;
         }
 
-        if(!cur->dir){
+        if (!cur->dir)
+        {
             cur->dir = new;
             break;
         }
 
-        else{
+        else
+        {
             queue[end++] = cur->dir;
         }
     }
