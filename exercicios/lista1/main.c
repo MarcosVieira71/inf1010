@@ -246,3 +246,15 @@ int countSubNodes(Node* root){
     root->subNodes = leftSubNodes + rightSubNodes;
     return root->subNodes + 1;
 }
+
+int countHeight(Node* root){
+    if(!root){
+        return -1;
+    }
+
+    int heightLeft, heightRight;
+    heightLeft = countHeight(root->left);
+    heightRight = countHeight(root->right);
+
+    return(heightLeft > heightRight ? heightLeft : heightRight) + 1;
+}
