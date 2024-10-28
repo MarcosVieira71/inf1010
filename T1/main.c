@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TAMANHO 29
+#define TAMANHO 1321
 
-char** inicializaHashTable(){
+char** inicializaHashTable() {
     char** hashTable = (char**)malloc(sizeof(char*) * TAMANHO);
     for (int i = 0; i < TAMANHO; i++) {
         hashTable[i] = NULL;
@@ -12,56 +12,67 @@ char** inicializaHashTable(){
     return hashTable;
 }
 
-int hashCPF(char* cpf){
-    unsigned int hash = 0;
-    for(int i = 0; cpf[i] != '\0'; i++){
-        hash = (hash * 31) ^ (cpf[i] - '0');
+int hashCPF(char* cpf) {
+    unsigned long hash = 5381;
+    for (int i = 0; cpf[i] != '\0'; i++) {
+        hash = ((hash << 5) + hash) + (cpf[i] - '0');
     }
     return hash % TAMANHO;
 }
 
-int hashSecundaria(char* cpf) {
-    unsigned int hash = 0;
-     for (int i = 0; cpf[i] != '\0'; i++) {
-        hash = (hash * 37) + (cpf[i] - '0');  
+int hashSecundaria(char** hashTable, char* cpf) {
+    int idx = hashCPF(cpf);
+    int i = 0;
+    while (hashTable[(idx + i * i) % TAMANHO] != NULL) {
+        i++;
     }
-    return 1 + (hash % (TAMANHO - 1)); 
+    return (idx + i * i) % TAMANHO;
 }
 
-int main(void){
+int main(void) {
     char** hashTable = inicializaHashTable();
     FILE* arquivoCpfs = fopen("cpfs.txt", "r");
-        if (arquivoCpfs == NULL) {
+    if (arquivoCpfs == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return 1;
     }
 
     char cpf[12];
-    int cont = 0;
     int colisoes = 0;
+    int armazenados = 0;
 
-    while (fscanf(arquivoCpfs, "%11s", cpf) != EOF && cont < 20){ 
+    while (fscanf(arquivoCpfs, " %11s", cpf) != EOF) {
         int idx = hashCPF(cpf);
+        int tentativas = 0;
 
-        while(hashTable[idx] != NULL) {
+        while (hashTable[idx] != NULL) {
             colisoes++;
-            idx = (idx + hashSecundaria(cpf))% TAMANHO;
+            idx = hashSecundaria(hashTable, cpf);
+            tentativas++;
         }
-        
+
         hashTable[idx] = strdup(cpf);
-        cont++;
+        armazenados++;
     }
 
-    for(int i = 0; i < TAMANHO; i++){
-        printf("%dº CPF armazenado = %s\n",i,  hashTable[i]);
+    printf("CPFs armazenados:\n");
+    int contadorCpfs = 0;
+    for (int i = 0; i < TAMANHO; i++) {
+        if (hashTable[i] != NULL) {
+            contadorCpfs++;
+            printf("%d CPF armazenado = %s\n", contadorCpfs, hashTable[i]);
+        }
     }
 
+    printf("Total de CPFs armazenados: %d\n", armazenados);
     printf("Colisões: %d\n", colisoes);
+
     fclose(arquivoCpfs);
 
-    for(int i = 0; i < TAMANHO; i++) {
+    for (int i = 0; i < TAMANHO; i++) {
         free(hashTable[i]);
     }
-
     free(hashTable);
+
+    return 0;
 }
