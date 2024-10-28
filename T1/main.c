@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TAMANHO 1321
+#define TAMANHO 1249
 
 char** inicializaHashTable() {
     char** hashTable = (char**)malloc(sizeof(char*) * TAMANHO);
