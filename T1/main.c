@@ -59,15 +59,18 @@ int main(void) {
 
     printf("CPFs armazenados:\n");
     int contadorCpfs = 0;
+    int vazios = 0;
     for (int i = 0; i < TAMANHO; i++) {
         if (hashTable[i] != NULL) {
             contadorCpfs++;
-            //printf("%d CPF armazenado = %s\n", contadorCpfs, hashTable[i]);
         }
+        else vazios++;
     }
 
-    printf("Total de CPFs armazenados: %d\n", armazenados);
+    printf("Total de CPFs armazenados: %d\n", contadorCpfs);
     printf("Colisões: %d\n", colisoes);
+    printf("Vazios: %d\n", vazios);
+
 
     fclose(arquivoCpfs);
 
