@@ -20,11 +20,12 @@ int hashCPF(char* cpf) {
     return hash % TAMANHO;
 }
 
-int hashSecundaria(char** hashTable, char* cpf) {
+int hashSecundaria(char** hashTable, char* cpf, int* colisoes) {
     int idx = hashCPF(cpf);
     int i = 0;
     while (hashTable[(idx + i * i) % TAMANHO] != NULL) {
         i++;
+        (*colisoes)++;
     }
     return (idx + i * i) % TAMANHO;
 }
@@ -47,12 +48,13 @@ int main(void) {
 
         while (hashTable[idx] != NULL) {
             colisoes++;
-            idx = hashSecundaria(hashTable, cpf);
+            idx = hashSecundaria(hashTable, cpf, &colisoes);
             tentativas++;
         }
 
         hashTable[idx] = strdup(cpf);
         armazenados++;
+        if(armazenados % 100 == 0) printf("\n%d - Colisões: %d\n", armazenados, colisoes);
     }
 
     printf("CPFs armazenados:\n");
@@ -60,7 +62,7 @@ int main(void) {
     for (int i = 0; i < TAMANHO; i++) {
         if (hashTable[i] != NULL) {
             contadorCpfs++;
-            printf("%d CPF armazenado = %s\n", contadorCpfs, hashTable[i]);
+            //printf("%d CPF armazenado = %s\n", contadorCpfs, hashTable[i]);
         }
     }
 
