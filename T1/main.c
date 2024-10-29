@@ -30,6 +30,28 @@ int hashSecundaria(char** hashTable, char* cpf, int* colisoes) {
     return (idx + i * i) % TAMANHO;
 }
 
+void liberaHashTable(char** hashTable) {
+    for (int i = 0; i < TAMANHO; i++) {
+        free(hashTable[i]);
+    }
+    free(hashTable);
+}
+
+int insereHash(char** hashTable, char* cpf, int* colisoes) {
+    int idx = hashCPF(cpf);
+        int tentativas = 0;
+
+        while (hashTable[idx] != NULL) {
+            (*colisoes)++;
+            idx = hashSecundaria(hashTable, cpf, colisoes);
+            tentativas++;
+        }
+
+        hashTable[idx] = strdup(cpf);
+
+    return tentativas;
+}
+
 int main(void) {
     char** hashTable = inicializaHashTable();
     FILE* arquivoCpfs = fopen("cpfs.txt", "r");
@@ -43,16 +65,7 @@ int main(void) {
     int armazenados = 0;
 
     while (fscanf(arquivoCpfs, " %11s", cpf) != EOF) {
-        int idx = hashCPF(cpf);
-        int tentativas = 0;
-
-        while (hashTable[idx] != NULL) {
-            colisoes++;
-            idx = hashSecundaria(hashTable, cpf, &colisoes);
-            tentativas++;
-        }
-
-        hashTable[idx] = strdup(cpf);
+        insereHash(hashTable, cpf, &colisoes);
         armazenados++;
         if(armazenados % 100 == 0) printf("\n%d - Colisões: %d\n", armazenados, colisoes);
     }
@@ -74,10 +87,8 @@ int main(void) {
 
     fclose(arquivoCpfs);
 
-    for (int i = 0; i < TAMANHO; i++) {
-        free(hashTable[i]);
-    }
-    free(hashTable);
+    liberaHashTable(hashTable);
 
     return 0;
 }
+
