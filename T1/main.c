@@ -4,53 +4,11 @@
 
 #define TAMANHO 1249
 
-char** inicializaHashTable() {
-    char** hashTable = (char**)malloc(sizeof(char*) * TAMANHO);
-    for (int i = 0; i < TAMANHO; i++) {
-        hashTable[i] = NULL;
-    }
-    return hashTable;
-}
-
-int hashCPF(char* cpf) {
-    unsigned long hash = 5381;
-    for (int i = 0; cpf[i] != '\0'; i++) {
-        hash = ((hash << 5) + hash) + (cpf[i] - '0');
-    }
-    return hash % TAMANHO;
-}
-
-int hashSecundaria(char** hashTable, char* cpf, int* colisoes) {
-    int idx = hashCPF(cpf);
-    int i = 0;
-    while (hashTable[(idx + i * i) % TAMANHO] != NULL) {
-        i++;
-        (*colisoes)++;
-    }
-    return (idx + i * i) % TAMANHO;
-}
-
-void liberaHashTable(char** hashTable) {
-    for (int i = 0; i < TAMANHO; i++) {
-        free(hashTable[i]);
-    }
-    free(hashTable);
-}
-
-int insereHash(char** hashTable, char* cpf, int* colisoes) {
-    int idx = hashCPF(cpf);
-        int tentativas = 0;
-
-        while (hashTable[idx] != NULL) {
-            (*colisoes)++;
-            idx = hashSecundaria(hashTable, cpf, colisoes);
-            tentativas++;
-        }
-
-        hashTable[idx] = strdup(cpf);
-
-    return tentativas;
-}
+char** inicializaHashTable(void);
+int hashCPF(char* cpf);
+int hashSecundaria(int idx, int i);
+int insereHash(char** hashTable, char* cpf, int* colisoes);
+void liberaHashTable(char** hashTable);
 
 int main(void) {
     char** hashTable = inicializaHashTable();
@@ -90,5 +48,49 @@ int main(void) {
     liberaHashTable(hashTable);
 
     return 0;
+}
+
+char** inicializaHashTable() {
+    char** hashTable = (char**)malloc(sizeof(char*) * TAMANHO);
+    for (int i = 0; i < TAMANHO; i++) {
+        hashTable[i] = NULL;
+    }
+    return hashTable;
+}
+
+int hashCPF(char* cpf) {
+    unsigned long hash = 5381;
+    for (int i = 0; cpf[i] != '\0'; i++) {
+        hash = ((hash << 5) + hash) + (cpf[i]-'0');
+    }
+    return hash % TAMANHO;
+}
+
+int hashSecundaria(int idx, int i) {
+    return (idx + i * i) % TAMANHO;
+}
+
+int insereHash(char** hashTable, char* cpf, int* colisoes) {
+    int idx = hashCPF(cpf);
+        int tentativas = 0;
+        int i = 0;
+
+        while (hashTable[idx] != NULL) {
+            (*colisoes)++;
+            i++;
+            idx = hashSecundaria(hashCPF(cpf), i);
+            tentativas++;
+        }
+
+        hashTable[idx] = strdup(cpf);
+
+    return tentativas;
+}
+
+void liberaHashTable(char** hashTable) {
+    for (int i = 0; i < TAMANHO; i++) {
+        free(hashTable[i]);
+    }
+    free(hashTable);
 }
 
