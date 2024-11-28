@@ -83,6 +83,7 @@ No* insereChave(No* raiz, int chave, int ehFolha) {
         }
     }
     else{
+        printf("%d", chave);
         int idxPonteiro = encontraIndexInsercaoPonteiro(raiz, chave);
         int ponteiroEhFolha = verificaEhFolha(raiz->ponteiros[idxPonteiro]);
         raiz->ponteiros[idxPonteiro] = insereChave(raiz->ponteiros[idxPonteiro], chave, ponteiroEhFolha);
@@ -102,9 +103,12 @@ No* cisaoFolha(No* raiz, int valorMeio){
         novaRaiz->ponteiros[1] = raiz;
         swapNo(raiz);
         novaRaiz->numChaves++;
+        raiz->pai = novaRaiz;
         return novaRaiz;
     }
-    return raiz;
+    else{
+
+    }
 }
 
 
@@ -138,7 +142,6 @@ int main() {
     raiz = insereChave(raiz, 15, !FOLHA);
     raiz = insereChave(raiz, 13, !FOLHA);
     raiz = insereChave(raiz, 5, !FOLHA);
-    raiz = insereChave(raiz, 20, !FOLHA);
     imprimeArvore(raiz);
 
     return 0;
