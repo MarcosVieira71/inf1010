@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #define FOLHA 1
-#define MAX_CHAVES 2
+#define MAX_CHAVES 3
 #define MAX_PONTEIROS 3 
 
 typedef struct No {
@@ -10,15 +10,26 @@ typedef struct No {
     struct No* ponteiros[MAX_PONTEIROS];
     int ehFolha;
     int numChaves;
+    struct No* pai;
 } No;
 
-No* criaNo(int folha) {
+
+No* criaNo(int folha, No* pai);
+No* cisaoFolha(No* raiz, int valorMeio);
+No* insereChave(No* raiz, int chave, int ehFolha);
+int encontraIndexInsercaoPonteiro(No* raiz, int chave);
+int encontraIndexInsercaoFolha(No* raiz, int chave);
+int verificaEhFolha(No* raiz);
+void swapNo(No* raiz);
+
+No* criaNo(int folha, No* pai) {
     No* novo = (No*)malloc(sizeof(No));
     if (!novo) return NULL;
     for (int i = 0; i < MAX_CHAVES; i++) novo->chaves[i] = -1;
     for (int i = 0; i < MAX_PONTEIROS; i++) novo->ponteiros[i] = NULL;
     novo->ehFolha = folha;
     novo->numChaves = 0;
+    novo->pai = pai;
     return novo;
 }
 
@@ -32,7 +43,15 @@ int encontraIndexInsercaoFolha(No* raiz, int chave){
     return i + 1;
 }
 
-
+int encontraIndexInsercaoPonteiro(No* raiz, int chave){
+    if(raiz->chaves[0] >= chave){
+        return 0;
+    }
+    else if(raiz->chaves[1] <= chave){
+        return 1;
+    }
+    else return 2;
+}
 
 int verificaEhFolha(No* raiz){
     for(int i = 0; i < MAX_PONTEIROS; i++){
@@ -41,35 +60,52 @@ int verificaEhFolha(No* raiz){
     return !FOLHA;
 }
 
+void swapNo(No* raiz){
+    raiz->chaves[0] = raiz->chaves[1]; 
+    raiz->chaves[1] = raiz->chaves[2]; 
+    raiz->chaves[2] = -1;
+    raiz->numChaves--;
+}
+
+
 No* insereChave(No* raiz, int chave, int ehFolha) {
     if (!raiz) {
-        raiz = criaNo(ehFolha);
+        raiz = criaNo(ehFolha, NULL);
         if (!raiz) return NULL;
     }
 
-
-    if(!raiz->ehFolha){
-        if(chave < raiz->chaves[0]){
-            raiz->ponteiros[0] = insereChave(raiz->ponteiros[0], chave, FOLHA);
+    if(raiz->ehFolha){
+        int idxFolha = encontraIndexInsercaoFolha(raiz, chave);
+        raiz->chaves[idxFolha] = chave;
+        raiz->numChaves++;  
+        if(raiz->numChaves== 3){
+            return cisaoFolha(raiz, raiz->chaves[1]);
         }
-    }
-    if(raiz->numChaves < MAX_CHAVES){
-        int index = encontraIndexInsercaoFolha(raiz, chave);
-        raiz->chaves[index] = chave;
-        raiz->numChaves++;
     }
     else{
-        if(chave < raiz->chaves[0]){
-            No* novaRaiz = NULL;
-            novaRaiz = insereChave(novaRaiz, raiz->chaves[0], !FOLHA);
-            novaRaiz->ponteiros[0] = insereChave(raiz->ponteiros[0], chave, FOLHA);
-            novaRaiz->ponteiros[1] = raiz;
-            return novaRaiz;
-        }
+        int idxPonteiro = encontraIndexInsercaoPonteiro(raiz, chave);
+        int ponteiroEhFolha = verificaEhFolha(raiz->ponteiros[idxPonteiro]);
+        raiz->ponteiros[idxPonteiro] = insereChave(raiz->ponteiros[idxPonteiro], chave, ponteiroEhFolha);
     }
     return raiz;
 }
 
+
+No* cisaoFolha(No* raiz, int valorMeio){
+    if(!(raiz->pai)){
+        No* novaRaiz = criaNo(!FOLHA, NULL);
+        novaRaiz->chaves[0] = valorMeio;
+        
+        No** filhoMenor = &(novaRaiz->ponteiros[0]);
+        *filhoMenor = insereChave(*(filhoMenor), raiz->chaves[0], FOLHA);
+        
+        novaRaiz->ponteiros[1] = raiz;
+        swapNo(raiz);
+        novaRaiz->numChaves++;
+        return novaRaiz;
+    }
+    return raiz;
+}
 
 
 
@@ -99,9 +135,10 @@ void imprimeArvore(No* no) {
 int main() {
     No* raiz = NULL;
     raiz = insereChave(raiz, 10,FOLHA);
-    raiz = insereChave(raiz, 5, !FOLHA); 
-    raiz = insereChave(raiz, 1, !FOLHA);
-    raiz = insereChave(raiz, 2, !FOLHA);
+    raiz = insereChave(raiz, 15, !FOLHA);
+    raiz = insereChave(raiz, 13, !FOLHA);
+    raiz = insereChave(raiz, 5, !FOLHA);
+    raiz = insereChave(raiz, 20, !FOLHA);
     imprimeArvore(raiz);
 
     return 0;
