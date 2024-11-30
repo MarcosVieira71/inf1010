@@ -17,10 +17,11 @@ typedef struct No {
 No* criaNo(int folha, No* pai);
 No* cisaoFolha(No* raiz, int valorMeio);
 No* insereChave(No* raiz, int chave, int ehFolha);
-int encontraIndexInsercaoPonteiro(No* raiz, int chave);
+int encontraIndexInsercaoPonteiro(No* raiz, int chave, int numChaves);
 int encontraIndexInsercaoFolha(No* raiz, int chave);
 int verificaEhFolha(No* raiz);
 void swapNo(No* raiz);
+No* cisaoInterna(No* raiz, int valorMeio);
 
 No* criaNo(int folha, No* pai) {
     No* novo = (No*)malloc(sizeof(No));
@@ -43,11 +44,14 @@ int encontraIndexInsercaoFolha(No* raiz, int chave){
     return i + 1;
 }
 
-int encontraIndexInsercaoPonteiro(No* raiz, int chave){
+int encontraIndexInsercaoPonteiro(No* raiz, int chave, int numChaves){
     if(raiz->chaves[0] >= chave){
         return 0;
     }
-    else if(raiz->chaves[1] <= chave){
+    else if(raiz->chaves[1] <= chave && numChaves < 2){
+        return 1;
+    }
+    else if(numChaves == 2 && raiz->chaves[1] >= chave) {
         return 1;
     }
     else return 2;
@@ -55,9 +59,9 @@ int encontraIndexInsercaoPonteiro(No* raiz, int chave){
 
 int verificaEhFolha(No* raiz){
     for(int i = 0; i < MAX_PONTEIROS; i++){
-        if(raiz->ponteiros[i]) return FOLHA;
+        if(raiz->ponteiros[i]) return !FOLHA;
     }
-    return !FOLHA;
+    return FOLHA;
 }
 
 void swapNo(No* raiz){
@@ -78,12 +82,12 @@ No* insereChave(No* raiz, int chave, int ehFolha) {
         int idxFolha = encontraIndexInsercaoFolha(raiz, chave);
         raiz->chaves[idxFolha] = chave;
         raiz->numChaves++;  
-        if(raiz->numChaves== 3){
+        if(raiz->numChaves == 3){
             return cisaoFolha(raiz, raiz->chaves[1]);
         }
     }
     else{
-        int idxPonteiro = encontraIndexInsercaoPonteiro(raiz, chave);
+        int idxPonteiro = encontraIndexInsercaoPonteiro(raiz, chave, raiz->numChaves);
         int ponteiroEhFolha = verificaEhFolha(raiz->ponteiros[idxPonteiro]);
         raiz->ponteiros[idxPonteiro] = insereChave(raiz->ponteiros[idxPonteiro], chave, ponteiroEhFolha);
     }
@@ -136,8 +140,6 @@ No* cisaoFolha(No* raiz, int valorMeio){
 }
 
 
-
-
 void imprimeArvore(No* no) {
     if (no == NULL) return;
     printf("No: %p, chaves: [", no);
@@ -163,11 +165,12 @@ void imprimeArvore(No* no) {
 
 int main() {
     No* raiz = NULL;
-    raiz = insereChave(raiz, 10,FOLHA);
+    raiz = insereChave(raiz, 10, FOLHA);
     raiz = insereChave(raiz, 15, !FOLHA);
     raiz = insereChave(raiz, 13, !FOLHA);
     raiz = insereChave(raiz, 5, !FOLHA);
     raiz = insereChave(raiz, 20, !FOLHA);
+    raiz = insereChave(raiz, 14, !FOLHA);
 
     imprimeArvore(raiz);
 
