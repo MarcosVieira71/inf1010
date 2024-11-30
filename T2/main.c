@@ -3,7 +3,7 @@
 
 #define FOLHA 1
 #define MAX_CHAVES 3
-#define MAX_PONTEIROS 3 
+#define MAX_PONTEIROS 4
 
 typedef struct No {
     int chaves[MAX_CHAVES];
@@ -13,15 +13,15 @@ typedef struct No {
     struct No* pai;
 } No;
 
+int fezSplit = 0;
 
 No* criaNo(int folha, No* pai);
 No* cisaoFolha(No* raiz, int valorMeio);
 No* insereChave(No* raiz, int chave, int ehFolha);
-int encontraIndexInsercaoPonteiro(No* raiz, int chave, int numChaves);
+int encontraIndexInsercaoPonteiro(No* raiz, int chave);
 int encontraIndexInsercaoFolha(No* raiz, int chave);
 int verificaEhFolha(No* raiz);
 void swapNo(No* raiz);
-No* cisaoInterna(No* raiz, int valorMeio);
 
 No* criaNo(int folha, No* pai) {
     No* novo = (No*)malloc(sizeof(No));
@@ -31,6 +31,7 @@ No* criaNo(int folha, No* pai) {
     novo->ehFolha = folha;
     novo->numChaves = 0;
     novo->pai = pai;
+    
     return novo;
 }
 
@@ -44,18 +45,12 @@ int encontraIndexInsercaoFolha(No* raiz, int chave){
     return i + 1;
 }
 
-int encontraIndexInsercaoPonteiro(No* raiz, int chave, int numChaves){
-    if(raiz->chaves[0] >= chave){
-        return 0;
-    }
-    else if(raiz->chaves[1] <= chave && numChaves < 2){
-        return 1;
-    }
-    else if(numChaves == 2 && raiz->chaves[1] >= chave) {
-        return 1;
-    }
-    else return 2;
+int encontraIndexInsercaoPonteiro(No* raiz, int chave){
+    int i = raiz->numChaves;
+    while (i > 0 && raiz->chaves[i-1] > chave)i--;
+    return i;
 }
+
 
 int verificaEhFolha(No* raiz){
     for(int i = 0; i < MAX_PONTEIROS; i++){
@@ -77,19 +72,31 @@ No* insereChave(No* raiz, int chave, int ehFolha) {
         raiz = criaNo(ehFolha, NULL);
         if (!raiz) return NULL;
     }
-
+    
     if(raiz->ehFolha){
         int idxFolha = encontraIndexInsercaoFolha(raiz, chave);
         raiz->chaves[idxFolha] = chave;
-        raiz->numChaves++;  
-        if(raiz->numChaves == 3){
+        raiz->numChaves++;
+        if(raiz->numChaves== 3){
             return cisaoFolha(raiz, raiz->chaves[1]);
-        }
+        } 
     }
-    else{
-        int idxPonteiro = encontraIndexInsercaoPonteiro(raiz, chave, raiz->numChaves);
+
+    else if(raiz->numChaves>0){
+        int idxPonteiro = encontraIndexInsercaoPonteiro(raiz, chave);
         int ponteiroEhFolha = verificaEhFolha(raiz->ponteiros[idxPonteiro]);
-        raiz->ponteiros[idxPonteiro] = insereChave(raiz->ponteiros[idxPonteiro], chave, ponteiroEhFolha);
+
+        No* retorno = insereChave(raiz->ponteiros[idxPonteiro], chave, ponteiroEhFolha);
+
+
+        if(fezSplit){
+            fezSplit=0;
+            No* temp = raiz;
+            while(temp->pai!=NULL)temp=temp->pai;
+            return temp;
+        }
+        else if(retorno == raiz->pai)return raiz->pai;
+       
     }
     return raiz;
 }
@@ -111,30 +118,62 @@ No* cisaoFolha(No* raiz, int valorMeio){
         novaRaiz->chaves[0] = valorMeio;
         
         No** filhoMenor = &(novaRaiz->ponteiros[0]);
-        *filhoMenor = insereChave(*(filhoMenor), raiz->chaves[0], FOLHA);
+        *filhoMenor = insereChave(NULL, raiz->chaves[0], raiz->ehFolha);
         (*filhoMenor)->pai = novaRaiz;
         novaRaiz->ponteiros[1] = raiz;
 
+        if(!raiz->ehFolha){
+            (*filhoMenor)->chaves[0] = raiz->chaves[0];
+            swapNo(raiz);
+           
+            (*filhoMenor)->ponteiros[0]=raiz->ponteiros[0];
+            (*filhoMenor)->ponteiros[1]=raiz->ponteiros[1];
+            raiz->ponteiros[0]->pai=(*filhoMenor);
+            raiz->ponteiros[1]->pai=(*filhoMenor);
+            (*filhoMenor)->numChaves++;
+          
+            raiz->ponteiros[0]=raiz->ponteiros[2];
+            raiz->ponteiros[1]=raiz->ponteiros[3];
+            raiz->ponteiros[2]=raiz->ponteiros[3]=NULL;
+
+            fezSplit = 1;
+        }
         swapNo(raiz);
         novaRaiz->numChaves++;
         raiz->pai = novaRaiz;
         return novaRaiz;
     }
     else{
-        raiz->pai = insereChaveInterno(raiz->pai, valorMeio);
 
-        
+        int idx = encontraIndexInsercaoPonteiro(raiz->pai, raiz->chaves[0])+1;
 
         No* filhoMenor = criaNo(FOLHA, raiz->pai);
         filhoMenor = insereChave(filhoMenor, raiz->chaves[0], FOLHA);
-        raiz->pai->ponteiros[2] = filhoMenor;
+        filhoMenor->ehFolha = raiz->ehFolha;
+        raiz->pai->ponteiros[idx] = filhoMenor;
         swapNo(raiz);
-        int temp = raiz->pai->ponteiros[2]->chaves[0];
-        raiz->pai->ponteiros[2]->chaves[0] = raiz->pai->ponteiros[1]->chaves[0];
-        raiz->pai->ponteiros[2]->chaves[1] = raiz->pai->ponteiros[1]->chaves[1];
-        raiz->pai->ponteiros[1]->chaves[0] = temp;
-        raiz->pai->ponteiros[2]->numChaves++;
-        raiz->pai->ponteiros[1]->numChaves--;
+        int temp = raiz->pai->ponteiros[idx]->chaves[0];
+        raiz->pai->ponteiros[idx]->chaves[0] = raiz->pai->ponteiros[idx-1]->chaves[0];
+        raiz->pai->ponteiros[idx]->chaves[1] = raiz->pai->ponteiros[idx-1]->chaves[1];
+        raiz->pai->ponteiros[idx-1]->chaves[0] = temp;
+        raiz->pai->ponteiros[idx]->numChaves++;
+        raiz->pai->ponteiros[idx-1]->numChaves--;
+
+        if(!raiz->ehFolha){
+            swapNo(filhoMenor);
+                   
+            filhoMenor->ponteiros[0]=raiz->ponteiros[2];     
+            filhoMenor->ponteiros[1]=raiz->ponteiros[3];
+            raiz->ponteiros[2]->pai=filhoMenor;
+            raiz->ponteiros[3]->pai=filhoMenor;
+          
+            raiz->ponteiros[2]=raiz->ponteiros[3]=NULL;
+        }
+        
+        raiz->pai->ponteiros[idx] = filhoMenor;
+
+        insereChaveInterno(raiz->pai, valorMeio);
+
         return raiz;
     }
 }
@@ -165,12 +204,17 @@ void imprimeArvore(No* no) {
 
 int main() {
     No* raiz = NULL;
-    raiz = insereChave(raiz, 10, FOLHA);
-    raiz = insereChave(raiz, 15, !FOLHA);
-    raiz = insereChave(raiz, 13, !FOLHA);
+    
+    raiz = insereChave(raiz, 10,FOLHA);
+    raiz = insereChave(raiz, 15, FOLHA);
+    raiz = insereChave(raiz, 13, FOLHA);
     raiz = insereChave(raiz, 5, !FOLHA);
     raiz = insereChave(raiz, 20, !FOLHA);
-    raiz = insereChave(raiz, 14, !FOLHA);
+    raiz = insereChave(raiz, 25, !FOLHA);
+    raiz = insereChave(raiz, 26, !FOLHA);
+    raiz = insereChave(raiz, 27, !FOLHA);
+    raiz = insereChave(raiz, 28, !FOLHA);
+    raiz = insereChave(raiz, 29, !FOLHA);
 
     imprimeArvore(raiz);
 
