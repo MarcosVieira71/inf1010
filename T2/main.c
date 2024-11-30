@@ -37,14 +37,14 @@ No* criaNo(int folha, No* pai) {
 
 // Encontra posição para inserir ordenadamente
 int encontraIndexInsercaoFolha(No* raiz, int chave){
-    int i = raiz->numChaves - 1;
-    while (i >= 0 && raiz->chaves[i] > chave) {
-        raiz->chaves[i + 1] = raiz->chaves[i]; // Desloca a chave maior
+    int i = raiz->numChaves;
+    while (i > 0 && raiz->chaves[i-1] > chave) {
+        raiz->chaves[i] = raiz->chaves[i-1]; // Desloca a chave maior
+        raiz->ponteiros[i+1] = raiz->ponteiros[i];
         i--;
     }
-    return i + 1;
+    return i;
 }
-
 int encontraIndexInsercaoPonteiro(No* raiz, int chave){
     int i = raiz->numChaves;
     while (i > 0 && raiz->chaves[i-1] > chave)i--;
