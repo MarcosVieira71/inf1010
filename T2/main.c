@@ -23,6 +23,7 @@ int encontraIndexInsercaoPonteiro(No* raiz, int chave);
 int encontraIndexInsercaoFolha(No* raiz, int chave);
 int verificaEhFolha(No* raiz);
 void swapNo(No* raiz);
+No* removerChave(No* raiz, int chave);
 
 No* criaNo(int folha, No* pai) {
     No* novo = (No*)malloc(sizeof(No));
@@ -220,6 +221,22 @@ No* buscarChave(No* no, int chave){
     return buscarChave(no->ponteiros[2], chave);
 }
 
+No* removerChave(No* raiz, int chave) {
+    No* noChave = buscarChave(raiz, chave);
+    int idxChave = -1;
+
+    for(int idxChave = 0; idxChave<MAX_CHAVES; idxChave++) {
+        if(noChave->chaves[idxChave] == chave){
+            break;
+        }
+    }
+
+    return raiz;
+
+}
+
+
+
 int main() {
     No* raiz = NULL;
     
@@ -233,9 +250,13 @@ int main() {
     raiz = insereChave(raiz, 27, !FOLHA);
     raiz = insereChave(raiz, 28, !FOLHA);
 
-    No* encontraChaveExistente = buscarChave(raiz, 28);
+    No* encontraChaveExistente = buscarChave(raiz, 13);
     No* encontraChaveNaoExistente = buscarChave(raiz, 30);
 
+    imprimeArvore(raiz);
+
+    raiz = removerChave(raiz, 13);
+    printf("\napos remocao:\n\n");
     imprimeArvore(raiz);
 
     printf("\nTeste encontrar chave existente: %p\n", encontraChaveExistente);
