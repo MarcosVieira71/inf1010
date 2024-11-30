@@ -18,6 +18,7 @@ int fezSplit = 0;
 No* criaNo(int folha, No* pai);
 No* cisaoFolha(No* raiz, int valorMeio);
 No* insereChave(No* raiz, int chave, int ehFolha);
+No* buscarChave(No* no, int chave);
 int encontraIndexInsercaoPonteiro(No* raiz, int chave);
 int encontraIndexInsercaoFolha(No* raiz, int chave);
 int verificaEhFolha(No* raiz);
