@@ -211,7 +211,7 @@ No* buscarChave(No* no, int chave){
         }
         else return NULL;
     }
-    if(chave < no->chaves[0] || no->chaves[1] == - 1){
+    if(chave < no->chaves[0]){
         return buscarChave(no->ponteiros[0], chave);
     }
     else if(no->chaves[1] == -1 || chave < no->chaves[1]){
