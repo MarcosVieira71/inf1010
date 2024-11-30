@@ -202,6 +202,23 @@ void imprimeArvore(No* no) {
     }
 }
 
+No* buscarChave(No* no, int chave){
+    if(!no) return NULL;
+    if(no->ehFolha){
+        if(no->chaves[0] == chave || no->chaves[1] == chave){
+            return no;
+        }
+        else return NULL;
+    }
+    if(chave < no->chaves[0] || no->chaves[1] == - 1){
+        return buscarChave(no->ponteiros[0], chave);
+    }
+    else if(no->chaves[1] == -1 || chave < no->chaves[1]){
+        return buscarChave(no->ponteiros[1], chave);
+    }
+    return buscarChave(no->ponteiros[2], chave);
+}
+
 int main() {
     No* raiz = NULL;
     
@@ -214,9 +231,15 @@ int main() {
     raiz = insereChave(raiz, 26, !FOLHA);
     raiz = insereChave(raiz, 27, !FOLHA);
     raiz = insereChave(raiz, 28, !FOLHA);
-    raiz = insereChave(raiz, 29, !FOLHA);
+
+    No* encontraChaveExistente = buscarChave(raiz, 28);
+    No* encontraChaveNaoExistente = buscarChave(raiz, 30);
 
     imprimeArvore(raiz);
+
+    printf("\nTeste encontrar chave existente: %p\n", encontraChaveExistente);
+    
+    printf("Teste encontrar chave nao existente: %p\n", encontraChaveNaoExistente);
 
     return 0;
 }
