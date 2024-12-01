@@ -315,7 +315,14 @@ No* excluirChave(No* raiz, int chave) {
     return raiz;
 }
 
+void redistribuir(No* raiz, int idxPonteiro) {
 
+}
+
+
+void merge(No* raiz, int idxPonteiro) {
+   
+}
 
 No* removerChave(No* raiz, int chave) {
     if (!raiz) return NULL; // Chave não encontrada
@@ -337,39 +344,22 @@ No* removerChave(No* raiz, int chave) {
             idxPonteiro--;
         }
         raiz = removerChave(raiz->ponteiros[idxPonteiro], chave);
-        if(raiz->ponteiros[idxPonteiro]->numChaves < 1){
-            if(idxPonteiro == 1){
-                if(raiz->ponteiros[idxPonteiro - 1]->numChaves == 2){
-                    redistribuir;
-                }                
-                else if(raiz->ponteiros[idxPonteiro + 1]->numChaves == 2){
-                    redistribuir;
+        if (raiz->ponteiros[idxPonteiro]->numChaves < 1) {
+            if (idxPonteiro > 0 && raiz->ponteiros[idxPonteiro - 1]->numChaves > 1) {
+                redistribuir(raiz, idxPonteiro);
+            } else if (idxPonteiro < raiz->numChaves && raiz->ponteiros[idxPonteiro + 1]->numChaves > 1) {
+                redistribuir(raiz, idxPonteiro + 1);
+            } else {
+                if (idxPonteiro > 0) {
+                    merge(raiz, idxPonteiro - 1);
+                } else {
+                    merge(raiz, idxPonteiro);
                 }
-                else{
-                    merge
-                }
-            }
-            else if(idxPonteiro == 2){
-                if(raiz->ponteiros[idxPonteiro - 1]->numChaves == 2){
-                    redistribuir;
-                }
-                else{
-                    merge
-                }
-            else{
-                if(raiz->ponteiros[idxPonteiro + 1]->numChaves == 2){
-                    redistribuir;
-                }
-                else{
-                    merge
-                }
-            }
             }
         }
     }
     return raiz;
 }
-
 
 int main() {
     No* raiz = NULL;
