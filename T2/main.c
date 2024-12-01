@@ -338,12 +338,32 @@ No* removerChave(No* raiz, int chave) {
         }
         raiz = removerChave(raiz->ponteiros[idxPonteiro], chave);
         if(raiz->ponteiros[idxPonteiro]->numChaves < 1){
-            if(idxPonteiro > 0){
+            if(idxPonteiro == 1){
                 if(raiz->ponteiros[idxPonteiro - 1]->numChaves == 2){
-                    
+                    redistribuir;
+                }                
+                else if(raiz->ponteiros[idxPonteiro + 1]->numChaves == 2){
+                    redistribuir;
                 }
-                else if()
-                
+                else{
+                    merge
+                }
+            }
+            else if(idxPonteiro == 2){
+                if(raiz->ponteiros[idxPonteiro - 1]->numChaves == 2){
+                    redistribuir;
+                }
+                else{
+                    merge
+                }
+            else{
+                if(raiz->ponteiros[idxPonteiro + 1]->numChaves == 2){
+                    redistribuir;
+                }
+                else{
+                    merge
+                }
+            }
             }
         }
     }
