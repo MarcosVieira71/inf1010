@@ -24,6 +24,7 @@ int encontraIndexInsercaoFolha(No* raiz, int chave);
 int verificaEhFolha(No* raiz);
 void swapNo(No* raiz);
 No* excluirChave(No* raiz, int chave);
+void concatenarRedistribuir(No* raiz, No* no);
 
 No* criaNo(int folha, No* pai) {
     No* novo = (No*)malloc(sizeof(No));
@@ -222,96 +223,59 @@ No* buscarChave(No* no, int chave){
 }
 
 No* excluirChave(No* raiz, int chave) {
-    No* no = buscarChave(raiz, chave);
-    if (!no) return raiz; // Chave não encontrada
-    
-    // Remover a chave do nó
-    int i;
-    for (i = 0; i < no->numChaves; i++) {
-        if (no->chaves[i] == chave) break;
-    }
-    for (; i < no->numChaves - 1; i++) {
-        no->chaves[i] = no->chaves[i + 1];
-    }
-    no->chaves[no->numChaves - 1] = -1;
-    no->numChaves--;
+    No* no = raiz;
 
-    // Verificar se precisa de redistribuição ou fusão
-    if (no->numChaves < 1 && no->pai) {
-        No* pai = no->pai;
-        int idx;
-        for (idx = 0; idx <= pai->numChaves; idx++) {
-            if (pai->ponteiros[idx] == no) break;
-        }
-
-        // Tentar redistribuir
-        if (idx > 0 && pai->ponteiros[idx - 1]->numChaves > 1) {
-            No* irmaoEsq = pai->ponteiros[idx - 1];
-            no->chaves[0] = pai->chaves[idx - 1];
-            no->numChaves++;
-            pai->chaves[idx - 1] = irmaoEsq->chaves[irmaoEsq->numChaves - 1];
-            irmaoEsq->chaves[irmaoEsq->numChaves - 1] = -1;
-            irmaoEsq->numChaves--;
-        }
-        else if (idx < pai->numChaves && pai->ponteiros[idx + 1]->numChaves > 1) {
-            No* irmaoDir = pai->ponteiros[idx + 1];
-            no->chaves[no->numChaves] = pai->chaves[idx];
-            no->numChaves++;
-            pai->chaves[idx] = irmaoDir->chaves[0];
-            for (int j = 0; j < irmaoDir->numChaves - 1; j++) {
-                irmaoDir->chaves[j] = irmaoDir->chaves[j + 1];
-            }
-            irmaoDir->chaves[irmaoDir->numChaves - 1] = -1;
-            irmaoDir->numChaves--;
-        }
-        else {
-            // Fazer fusão
-            if (idx > 0) {
-                No* irmaoEsq = pai->ponteiros[idx - 1];
-                irmaoEsq->chaves[irmaoEsq->numChaves] = pai->chaves[idx - 1];
-                irmaoEsq->numChaves++;
-                for (int j = 0; j < no->numChaves; j++) {
-                    irmaoEsq->chaves[irmaoEsq->numChaves + j] = no->chaves[j];
-                }
-                irmaoEsq->numChaves += no->numChaves;
-                free(no);
-                for (int j = idx - 1; j < pai->numChaves - 1; j++) {
-                    pai->chaves[j] = pai->chaves[j + 1];
-                    pai->ponteiros[j + 1] = pai->ponteiros[j + 2];
-                }
-                pai->chaves[pai->numChaves - 1] = -1;
-                pai->ponteiros[pai->numChaves] = NULL;
-                pai->numChaves--;
-            }
-            else {
-                No* irmaoDir = pai->ponteiros[idx + 1];
-                no->chaves[no->numChaves] = pai->chaves[idx];
-                no->numChaves++;
-                for (int j = 0; j < irmaoDir->numChaves; j++) {
-                    no->chaves[no->numChaves + j] = irmaoDir->chaves[j];
-                }
-                no->numChaves += irmaoDir->numChaves;
-                free(irmaoDir);
-                for (int j = idx; j < pai->numChaves - 1; j++) {
-                    pai->chaves[j] = pai->chaves[j + 1];
-                    pai->ponteiros[j + 1] = pai->ponteiros[j + 2];
-                }
-                pai->chaves[pai->numChaves - 1] = -1;
-                pai->ponteiros[pai->numChaves] = NULL;
-                pai->numChaves--;
-            }
+    // 1. Buscar a chave nas folhas
+    while (no != NULL && !no->ehFolha) {
+        if (chave < no->chaves[0] || no->chaves[0] == -1) {
+            no = no->ponteiros[0];
+        } else if (no->chaves[1] == -1 || chave < no->chaves[1]) {
+            no = no->ponteiros[1];
+        } else {
+            no = no->ponteiros[2];
         }
     }
 
-    // Ajuste da raiz, se necessário
-    if (raiz->numChaves == 0 && !raiz->ehFolha) {
-        No* novaRaiz = raiz->ponteiros[0];
-        novaRaiz->pai = NULL;
-        free(raiz);
-        raiz = novaRaiz;
+    // 2. Excluir todas as instâncias da chave nas folhas
+    while (no != NULL) {
+        if (no->chaves[0] == chave) {
+            no->chaves[0] = no->chaves[1];  // Move chave2 para chave1
+            no->chaves[1] = -1;           // Apaga chave2
+        } else if (no->chaves[1] == chave) {
+            no->chaves[1] = -1;           // Apaga chave2
+        }
+
+        // Se o nó ficou vazio após a exclusão, redistribuir ou mesclar
+        if (no->chaves[0] == -1) {
+            concatenarRedistribuir(raiz, no);  // Chama para redistribuir ou mesclar
+        }
+
+        // Continuar a busca no próximo nó pai
+        no = buscarChave(no->pai, chave);  // Continua a busca no nó pai
+    }
+
+    // 3. Atualiza a raiz caso a chave tenha sido removida da raiz
+    if (raiz != NULL && raiz->chaves[0] == -1) {
+        No* raizAntiga = raiz;
+        if (raiz->ponteiros[0] != NULL) {
+            raiz = raiz->ponteiros[0];  // A nova raiz será o primeiro filho
+            raiz->pai = NULL;    // A raiz não tem pai
+        } else {
+            raiz = NULL;
+        }
+        free(raizAntiga);
+    }
+
+    // Se a chave não for encontrada, apenas imprime uma mensagem de erro
+    if (no == NULL) {
+        printf("Chave %d não encontrada na árvore.\n", chave);
     }
 
     return raiz;
+}
+
+void concatenarRedistribuir(No* raiz, No* no) {
+    return;
 }
 
 
@@ -324,17 +288,17 @@ int main() {
     raiz = insereChave(raiz, 13, FOLHA);
     raiz = insereChave(raiz, 5, !FOLHA);
     raiz = insereChave(raiz, 20, !FOLHA);
-    // raiz = insereChave(raiz, 25, !FOLHA);
+    raiz = insereChave(raiz, 25, !FOLHA);
     // raiz = insereChave(raiz, 26, !FOLHA);
     // raiz = insereChave(raiz, 27, !FOLHA);
     // raiz = insereChave(raiz, 28, !FOLHA);
 
-    No* encontraChaveExistente = buscarChave(raiz, 15);
+    No* encontraChaveExistente = buscarChave(raiz, 10);
     No* encontraChaveNaoExistente = buscarChave(raiz, 30);
 
     imprimeArvore(raiz);
 
-    raiz = excluirChave(raiz, 13);
+    raiz = excluirChave(raiz, 5);
     printf("\napos remocao:\n\n");
     imprimeArvore(raiz);
 
