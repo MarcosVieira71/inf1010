@@ -235,7 +235,6 @@ No* excluirChave(No* raiz, int chave) {
     }
     no->chaves[no->numChaves - 1] = -1;
     no->numChaves--;
-
     // Verificar se precisa de redistribuição ou fusão
     if (no->numChaves < 1 && no->pai) {
         No* pai = no->pai;
@@ -246,6 +245,7 @@ No* excluirChave(No* raiz, int chave) {
 
         // Tentar redistribuir
         if (idx > 0 && pai->ponteiros[idx - 1]->numChaves > 1) {
+
             No* irmaoEsq = pai->ponteiros[idx - 1];
             no->chaves[0] = pai->chaves[idx - 1];
             no->numChaves++;
@@ -254,6 +254,7 @@ No* excluirChave(No* raiz, int chave) {
             irmaoEsq->numChaves--;
         }
         else if (idx < pai->numChaves && pai->ponteiros[idx + 1]->numChaves > 1) {
+
             No* irmaoDir = pai->ponteiros[idx + 1];
             no->chaves[no->numChaves] = pai->chaves[idx];
             no->numChaves++;
@@ -316,6 +317,40 @@ No* excluirChave(No* raiz, int chave) {
 
 
 
+No* removerChave(No* raiz, int chave) {
+    if (!raiz) return NULL; // Chave não encontrada
+    
+    if(raiz->ehFolha){
+        int i;
+        for (i = 0; i < raiz->numChaves; i++) {
+            if (raiz->chaves[i] == chave) break;
+        }
+        for (; i < raiz->numChaves - 1; i++) {
+            raiz->chaves[i] = raiz->chaves[i + 1];
+        }
+        raiz->chaves[raiz->numChaves - 1] = -1;
+        raiz->numChaves--;
+    }
+    else{
+        int idxPonteiro = raiz->numChaves;
+        while(chave > raiz->chaves[idxPonteiro] && idxPonteiro > 0){
+            idxPonteiro--;
+        }
+        raiz = removerChave(raiz->ponteiros[idxPonteiro], chave);
+        if(raiz->ponteiros[idxPonteiro]->numChaves < 1){
+            if(idxPonteiro > 0){
+                if(raiz->ponteiros[idxPonteiro - 1]->numChaves == 2){
+                    
+                }
+                else if()
+                
+            }
+        }
+    }
+    return raiz;
+}
+
+
 int main() {
     No* raiz = NULL;
     
@@ -334,7 +369,7 @@ int main() {
 
     imprimeArvore(raiz);
 
-    raiz = excluirChave(raiz, 13);
+    removerChave(raiz, 13);
     printf("\napos remocao:\n\n");
     imprimeArvore(raiz);
 
