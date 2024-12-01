@@ -23,7 +23,9 @@ int encontraIndexInsercaoPonteiro(No* raiz, int chave);
 int encontraIndexInsercaoFolha(No* raiz, int chave);
 int verificaEhFolha(No* raiz);
 void swapNo(No* raiz);
-No* excluirChave(No* raiz, int chave);
+No* removerChave(No* raiz, int chave);
+void redistribuir(No* raiz, int idx, int idxIrmao);
+void merge(No* raiz, int idx, int idxIrmao);
 
 No* criaNo(int folha, No* pai) {
     No* novo = (No*)malloc(sizeof(No));
@@ -221,108 +223,6 @@ No* buscarChave(No* no, int chave){
     return buscarChave(no->ponteiros[2], chave);
 }
 
-No* excluirChave(No* raiz, int chave) {
-    No* no = buscarChave(raiz, chave);
-    if (!no) return raiz; // Chave não encontrada
-    
-    // Remover a chave do nó
-    int i;
-    for (i = 0; i < no->numChaves; i++) {
-        if (no->chaves[i] == chave) break;
-    }
-    for (; i < no->numChaves - 1; i++) {
-        no->chaves[i] = no->chaves[i + 1];
-    }
-    no->chaves[no->numChaves - 1] = -1;
-    no->numChaves--;
-    // Verificar se precisa de redistribuição ou fusão
-    if (no->numChaves < 1 && no->pai) {
-        No* pai = no->pai;
-        int idx;
-        for (idx = 0; idx <= pai->numChaves; idx++) {
-            if (pai->ponteiros[idx] == no) break;
-        }
-
-        // Tentar redistribuir
-        if (idx > 0 && pai->ponteiros[idx - 1]->numChaves > 1) {
-
-            No* irmaoEsq = pai->ponteiros[idx - 1];
-            no->chaves[0] = pai->chaves[idx - 1];
-            no->numChaves++;
-            pai->chaves[idx - 1] = irmaoEsq->chaves[irmaoEsq->numChaves - 1];
-            irmaoEsq->chaves[irmaoEsq->numChaves - 1] = -1;
-            irmaoEsq->numChaves--;
-        }
-        else if (idx < pai->numChaves && pai->ponteiros[idx + 1]->numChaves > 1) {
-
-            No* irmaoDir = pai->ponteiros[idx + 1];
-            no->chaves[no->numChaves] = pai->chaves[idx];
-            no->numChaves++;
-            pai->chaves[idx] = irmaoDir->chaves[0];
-            for (int j = 0; j < irmaoDir->numChaves - 1; j++) {
-                irmaoDir->chaves[j] = irmaoDir->chaves[j + 1];
-            }
-            irmaoDir->chaves[irmaoDir->numChaves - 1] = -1;
-            irmaoDir->numChaves--;
-        }
-        else {
-            // Fazer fusão
-            if (idx > 0) {
-                No* irmaoEsq = pai->ponteiros[idx - 1];
-                irmaoEsq->chaves[irmaoEsq->numChaves] = pai->chaves[idx - 1];
-                irmaoEsq->numChaves++;
-                for (int j = 0; j < no->numChaves; j++) {
-                    irmaoEsq->chaves[irmaoEsq->numChaves + j] = no->chaves[j];
-                }
-                irmaoEsq->numChaves += no->numChaves;
-                free(no);
-                for (int j = idx - 1; j < pai->numChaves - 1; j++) {
-                    pai->chaves[j] = pai->chaves[j + 1];
-                    pai->ponteiros[j + 1] = pai->ponteiros[j + 2];
-                }
-                pai->chaves[pai->numChaves - 1] = -1;
-                pai->ponteiros[pai->numChaves] = NULL;
-                pai->numChaves--;
-            }
-            else {
-                No* irmaoDir = pai->ponteiros[idx + 1];
-                no->chaves[no->numChaves] = pai->chaves[idx];
-                no->numChaves++;
-                for (int j = 0; j < irmaoDir->numChaves; j++) {
-                    no->chaves[no->numChaves + j] = irmaoDir->chaves[j];
-                }
-                no->numChaves += irmaoDir->numChaves;
-                free(irmaoDir);
-                for (int j = idx; j < pai->numChaves - 1; j++) {
-                    pai->chaves[j] = pai->chaves[j + 1];
-                    pai->ponteiros[j + 1] = pai->ponteiros[j + 2];
-                }
-                pai->chaves[pai->numChaves - 1] = -1;
-                pai->ponteiros[pai->numChaves] = NULL;
-                pai->numChaves--;
-            }
-        }
-    }
-
-    // Ajuste da raiz, se necessário
-    if (raiz->numChaves == 0 && !raiz->ehFolha) {
-        No* novaRaiz = raiz->ponteiros[0];
-        novaRaiz->pai = NULL;
-        free(raiz);
-        raiz = novaRaiz;
-    }
-
-    return raiz;
-}
-
-void redistribuir(No* raiz, int idxPonteiro) {
-
-}
-
-
-void merge(No* raiz, int idxPonteiro) {
-   
-}
 
 No* removerChave(No* raiz, int chave) {
     if (!raiz) return NULL; // Chave não encontrada
@@ -337,28 +237,85 @@ No* removerChave(No* raiz, int chave) {
         }
         raiz->chaves[raiz->numChaves - 1] = -1;
         raiz->numChaves--;
+        return raiz;
     }
     else{
         int idxPonteiro = raiz->numChaves;
-        while(chave > raiz->chaves[idxPonteiro] && idxPonteiro > 0){
+
+        while(chave < raiz->chaves[idxPonteiro] && idxPonteiro > 0){
             idxPonteiro--;
         }
-        raiz = removerChave(raiz->ponteiros[idxPonteiro], chave);
+
+        raiz->ponteiros[idxPonteiro] = removerChave(raiz->ponteiros[idxPonteiro], chave);
         if (raiz->ponteiros[idxPonteiro]->numChaves < 1) {
-            if (idxPonteiro > 0 && raiz->ponteiros[idxPonteiro - 1]->numChaves > 1) {
-                redistribuir(raiz, idxPonteiro);
-            } else if (idxPonteiro < raiz->numChaves && raiz->ponteiros[idxPonteiro + 1]->numChaves > 1) {
-                redistribuir(raiz, idxPonteiro + 1);
-            } else {
+            if (idxPonteiro > 0 && raiz->ponteiros[idxPonteiro + 1]->numChaves > 1) {
+                redistribuir(raiz->ponteiros[idxPonteiro], idxPonteiro, idxPonteiro + 1);
+            } 
+            else if (idxPonteiro < raiz->numChaves && raiz->ponteiros[idxPonteiro]->numChaves > 1) {
+                redistribuir(raiz, idxPonteiro,idxPonteiro - 1);
+            } 
+            else {
                 if (idxPonteiro > 0) {
-                    merge(raiz, idxPonteiro - 1);
-                } else {
-                    merge(raiz, idxPonteiro);
-                }
+                        merge(raiz, idxPonteiro, idxPonteiro - 1);
+                    } 
+                    
+                else {
+                        merge(raiz, idxPonteiro, idxPonteiro + 1);
+                    }
             }
         }
     }
     return raiz;
+}
+
+void redistribuir(No* raiz, int idx, int idxIrmao){
+
+    if(idx < idxIrmao){
+        raiz->pai->chaves[idx] = raiz->pai->ponteiros[idxIrmao]->chaves[1];
+        raiz->chaves[0] = raiz->pai->ponteiros[idxIrmao]->chaves[0];
+        raiz->numChaves++;
+        swapNo(raiz->pai->ponteiros[idxIrmao]);
+    }
+    else{
+        raiz->pai->chaves[idxIrmao] = raiz->pai->ponteiros[idxIrmao]->chaves[0];
+        raiz->chaves[0] = raiz->pai->ponteiros[idxIrmao]->chaves[1];
+        raiz->numChaves++;
+        raiz->pai->ponteiros[idxIrmao]--;
+    }
+}
+void merge(No* raiz, int idx, int idxIrmao){
+    if(idx < idxIrmao){
+        raiz->pai->ponteiros[idx]->chaves[0] = raiz->pai->ponteiros[idxIrmao]->chaves[0];
+        free(raiz->pai->ponteiros[idxIrmao]);
+        raiz->pai->ponteiros[idxIrmao] = NULL;
+        if(idx == 0){
+            swapNo(raiz->pai);
+            if(raiz->pai->ponteiros[2]){
+                raiz->pai->ponteiros[1] = raiz->pai->ponteiros[2];
+                raiz->pai->ponteiros[2] = NULL;
+            }
+        }
+        else{
+            raiz->pai->chaves[1] = -1;
+            raiz->pai->numChaves--;
+            raiz->numChaves++;
+        }
+    }
+    else{
+        free(raiz->pai->ponteiros[idx]);
+        raiz->pai->ponteiros[idx] = NULL;
+        if(idxIrmao == 0){
+            swapNo(raiz->pai);
+            if(raiz->pai->ponteiros[2]){
+                raiz->pai->ponteiros[1] = raiz->pai->ponteiros[2];
+            }
+        }
+        if(idxIrmao == 1){
+            raiz->pai->chaves[1] = -1;
+            raiz->pai->numChaves--;
+            raiz->numChaves++;        
+        }
+    }
 }
 
 int main() {
@@ -367,21 +324,20 @@ int main() {
     raiz = insereChave(raiz, 10,FOLHA);
     raiz = insereChave(raiz, 15, FOLHA);
     raiz = insereChave(raiz, 13, FOLHA);
-    raiz = insereChave(raiz, 5, !FOLHA);
-    raiz = insereChave(raiz, 20, !FOLHA);
-    // raiz = insereChave(raiz, 25, !FOLHA);
-    // raiz = insereChave(raiz, 26, !FOLHA);
-    // raiz = insereChave(raiz, 27, !FOLHA);
-    // raiz = insereChave(raiz, 28, !FOLHA);
+
+    raiz = insereChave(raiz, 26, !FOLHA);
+    raiz = insereChave(raiz, 27, !FOLHA);
+    raiz = insereChave(raiz, 28, !FOLHA);
+
+    imprimeArvore(raiz);
+
+    raiz = removerChave(raiz, 28);
+    printf("\nApos remocao:\n\n");
+    imprimeArvore(raiz);
+
 
     No* encontraChaveExistente = buscarChave(raiz, 15);
     No* encontraChaveNaoExistente = buscarChave(raiz, 30);
-
-    imprimeArvore(raiz);
-
-    removerChave(raiz, 13);
-    printf("\napos remocao:\n\n");
-    imprimeArvore(raiz);
 
     printf("\nTeste encontrar chave existente: %p\n", encontraChaveExistente);
     
