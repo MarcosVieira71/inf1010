@@ -283,6 +283,7 @@ void redistribuir(No* raiz, int idx, int idxIrmao){
         raiz->pai->ponteiros[idxIrmao]--;
     }
 }
+
 void merge(No* raiz, int idx, int idxIrmao){
     if(idx < idxIrmao){
         raiz->pai->ponteiros[idx]->chaves[0] = raiz->pai->ponteiros[idxIrmao]->chaves[0];
@@ -324,7 +325,7 @@ int main() {
     raiz = insereChave(raiz, 10,FOLHA);
     raiz = insereChave(raiz, 15, FOLHA);
     raiz = insereChave(raiz, 13, FOLHA);
-
+    raiz = insereChave(raiz, 20, !FOLHA);
     raiz = insereChave(raiz, 26, !FOLHA);
     raiz = insereChave(raiz, 27, !FOLHA);
     raiz = insereChave(raiz, 28, !FOLHA);
@@ -337,7 +338,7 @@ int main() {
 
 
     No* encontraChaveExistente = buscarChave(raiz, 15);
-    No* encontraChaveNaoExistente = buscarChave(raiz, 30);
+    No* encontraChaveNaoExistente = buscarChave(raiz, 28);
 
     printf("\nTeste encontrar chave existente: %p\n", encontraChaveExistente);
     
