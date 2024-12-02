@@ -1,3 +1,7 @@
+// Julia Gomes Zibordi (2320934) - 3WA
+// Marcos Paulo Marinho Vieira (2320466) - 3WA
+// Kalline Barreto Ribeiro (2320623) - 3WD
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -225,45 +229,56 @@ No* buscarChave(No* no, int chave){
 
 
 No* removerChave(No* raiz, int chave) {
-    if (!raiz) return NULL; // Chave não encontrada
-    
-    if(raiz->ehFolha){
+    if(!raiz) return NULL;
+    if(raiz->ehFolha) {
         int i;
         for (i = 0; i < raiz->numChaves; i++) {
-            if (raiz->chaves[i] == chave) break;
+            if (raiz->chaves[i] == chave){printf("achou a chave\n"); break;} ;
         }
         for (; i < raiz->numChaves - 1; i++) {
             raiz->chaves[i] = raiz->chaves[i + 1];
         }
         raiz->chaves[raiz->numChaves - 1] = -1;
         raiz->numChaves--;
-        return raiz;
     }
-    else{
-        int idxPonteiro = raiz->numChaves;
-
-        while(chave < raiz->chaves[idxPonteiro] && idxPonteiro > 0){
-            idxPonteiro--;
+    else {
+        if(chave < raiz->chaves[0]){
+        return removerChave(raiz->ponteiros[0], chave);
         }
+        else if(raiz->chaves[1] == -1 || chave < raiz->chaves[1]){
+            return removerChave(raiz->ponteiros[1], chave);
+        }
+        return removerChave(raiz->ponteiros[2], chave);
+    }
 
-        raiz->ponteiros[idxPonteiro] = removerChave(raiz->ponteiros[idxPonteiro], chave);
-        if (raiz->ponteiros[idxPonteiro]->numChaves < 1) {
-            if (idxPonteiro > 0 && raiz->ponteiros[idxPonteiro + 1]->numChaves > 1) {
-                redistribuir(raiz->ponteiros[idxPonteiro], idxPonteiro, idxPonteiro + 1);
-            } 
-            else if (idxPonteiro < raiz->numChaves && raiz->ponteiros[idxPonteiro]->numChaves > 1) {
-                redistribuir(raiz, idxPonteiro,idxPonteiro - 1);
-            } 
+    printf("eita como chegou longe\n");
+
+    int idxPonteiro = encontraIndexInsercaoPonteiro(raiz->pai, chave);
+
+    printf("raiz->numChaves = %d\n", raiz->numChaves);
+
+    if (raiz->numChaves < 1) {
+        if (idxPonteiro > 0 && raiz->ponteiros[idxPonteiro + 1]->numChaves > 1) {
+            redistribuir(raiz->ponteiros[idxPonteiro], idxPonteiro, idxPonteiro + 1);
+        } 
+        else if (idxPonteiro < raiz->numChaves && raiz->ponteiros[idxPonteiro]->numChaves > 1) {
+            redistribuir(raiz, idxPonteiro,idxPonteiro - 1);
+        } 
+        else {
+            if (idxPonteiro > 0) {
+                printf("caiu aqui 1\n");
+                    merge(raiz, idxPonteiro, idxPonteiro - 1);
+                } 
+                
             else {
-                if (idxPonteiro > 0) {
-                        merge(raiz, idxPonteiro, idxPonteiro - 1);
-                    } 
-                    
-                else {
-                        merge(raiz, idxPonteiro, idxPonteiro + 1);
-                    }
-            }
+                    merge(raiz, idxPonteiro, idxPonteiro + 1);
+                }
         }
+    }
+
+    if(!raiz->pai) return raiz;
+    else {
+        while(raiz->pai) raiz=raiz->pai;
     }
     return raiz;
 }
@@ -291,6 +306,7 @@ void merge(No* raiz, int idx, int idxIrmao){
         raiz->pai->ponteiros[idxIrmao] = NULL;
         if(idx == 0){
             swapNo(raiz->pai);
+            if(raiz->pai->chaves[0] == -1) // merge 
             if(raiz->pai->ponteiros[2]){
                 raiz->pai->ponteiros[1] = raiz->pai->ponteiros[2];
                 raiz->pai->ponteiros[2] = NULL;
@@ -332,13 +348,13 @@ int main() {
 
     imprimeArvore(raiz);
 
-    raiz = removerChave(raiz, 28);
+    raiz = removerChave(raiz, 10);
     printf("\nApos remocao:\n\n");
     imprimeArvore(raiz);
 
 
     No* encontraChaveExistente = buscarChave(raiz, 15);
-    No* encontraChaveNaoExistente = buscarChave(raiz, 28);
+    No* encontraChaveNaoExistente = buscarChave(raiz, 30);
 
     printf("\nTeste encontrar chave existente: %p\n", encontraChaveExistente);
     
