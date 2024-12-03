@@ -23,6 +23,11 @@ Graph* criarGrafo(int v){
     Graph* grafo = (Graph*)malloc(sizeof(Graph));
     grafo->v = v;
     grafo->adj = (Node**)malloc(v * sizeof(Node*));
+
+    for (int i = 0; i < v; i++) {
+        grafo->adj[i] = NULL;
+    }
+
     return grafo;
 }
 
@@ -78,6 +83,41 @@ void imprimirGrafoComoMatriz(Graph* grafo) {
     }
 }
 
+void bfs(Graph* grafo, int inicio) {
+    int* visitados = (int*)malloc(grafo->v * sizeof(int));
+    for (int i = 0; i < grafo->v; i++) {
+        visitados[i] = 0;
+    }
+
+    int* fila = (int*)malloc(grafo->v * sizeof(int));
+    int inicioFila = 0, fimFila = 0;
+
+    visitados[inicio] = 1;
+    fila[fimFila++] = inicio;
+
+    while (inicioFila < fimFila) {
+        int verticeAtual = fila[inicioFila++];
+        printf("%d\n", verticeAtual);
+
+        Node* adjacente = grafo->adj[verticeAtual];
+        while (adjacente != NULL) {
+            int vizinho = adjacente->vertice;
+            if (!visitados[vizinho]) {
+                visitados[vizinho] = 1;
+                if (fimFila < grafo->v) {  
+                    fila[fimFila++] = vizinho;
+                }
+            }
+            adjacente = adjacente->prox;
+        }
+    }
+
+    free(fila);
+    free(visitados);
+}
+
+
+
 
 int main() {
     Graph* grafo = criarGrafo(9);
@@ -100,6 +140,8 @@ int main() {
 
     imprimirGrafo(grafo);
     imprimirGrafoComoMatriz(grafo);
+
+    bfs(grafo, 0);
 
     return 0;
 }
