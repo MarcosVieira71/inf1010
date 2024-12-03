@@ -163,7 +163,7 @@ void kruskal(Edge* arestas, int totalArestas, int numVertices) {
         parent[i] = i; 
     }
 
-    printf("\nArestas da Árvore Geradora Mínima:\n");
+    printf("\nArestas da Árvore Geradora Mínima:\n\n");
     for (int i = 0; i < totalArestas; i++) {
         int u = arestas[i].inicial;
         int v = arestas[i].final;
@@ -195,6 +195,8 @@ int main() {
 
     imprimirGrafo(grafo);
     imprimirGrafoComoMatriz(grafo);
+
+    printf("\nBusca em Amplitude:\n\n");
 
     buscaPorAmplitude(grafo, 0);
 
