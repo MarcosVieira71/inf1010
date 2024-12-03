@@ -12,6 +12,12 @@ typedef struct Graph {
     Node** adj;  
 } Graph;
 
+typedef struct Edge {
+    int inicial;
+    int final;
+    int distancia;
+} Edge;
+
 Node* criarNo(int vertice) {
     Node* novoNo = (Node*)malloc(sizeof(Node));
     novoNo->vertice = vertice;
@@ -23,19 +29,22 @@ Graph* criarGrafo(int v){
     Graph* grafo = (Graph*)malloc(sizeof(Graph));
     grafo->v = v;
     grafo->adj = (Node**)malloc(v * sizeof(Node*));
+    for (int i = 0; i < v; i++) {
+        grafo->adj[i] = NULL;
+    }
     return grafo;
 }
 
-void adicionarAresta(Graph* grafo, int inicial, int final, int distancia) {
-    Node* novoNo = criarNo(final);
-    novoNo->prox = grafo->adj[inicial];
-    novoNo->distancia = distancia;
-    grafo->adj[inicial] = novoNo;
+void adicionarAresta(Graph* grafo, Edge aresta) {
+    Node* novoNo = criarNo(aresta.final);
+    novoNo->prox = grafo->adj[aresta.inicial];
+    novoNo->distancia = aresta.distancia;
+    grafo->adj[aresta.inicial] = novoNo;
 
-    novoNo = criarNo(inicial);
-    novoNo->distancia = distancia;
-    novoNo->prox = grafo->adj[final];
-    grafo->adj[final] = novoNo;
+    novoNo = criarNo(aresta.inicial);
+    novoNo->distancia = aresta.distancia;
+    novoNo->prox = grafo->adj[aresta.final];
+    grafo->adj[aresta.final] = novoNo;
 }
 
 void imprimirGrafo(Graph* grafo) {
@@ -78,28 +87,70 @@ void imprimirGrafoComoMatriz(Graph* grafo) {
     }
 }
 
+void buscaPorAmplitude(Graph* grafo, int inicio) {
+    if (inicio < 0 || inicio >= grafo->v) {
+        printf("Índice de início fora dos limites\n");
+        return;
+    }
+
+    int* visitados = (int*)malloc(grafo->v * sizeof(int));
+    if (!visitados) {
+        printf("Erro ao alocar memória para visitados\n");
+        return;
+    }
+    for (int i = 0; i < grafo->v; i++) {
+        visitados[i] = 0;
+    }
+
+    int* fila = (int*)malloc(grafo->v * sizeof(int));
+    if (!fila) {
+        printf("Erro ao alocar memória para fila\n");
+        free(visitados);
+        return;
+    }
+
+    int inicioFila = 0, fimFila = 0;
+
+    visitados[inicio] = 1;
+    fila[fimFila++] = inicio;
+
+    while (inicioFila < fimFila) {
+        int verticeAtual = fila[inicioFila++];
+        printf("Visitando vértice %d\n", verticeAtual);
+
+        Node* adjacente = grafo->adj[verticeAtual];
+        while (adjacente != NULL) {
+            int vizinho = adjacente->vertice;
+            if (!visitados[vizinho]) {
+                visitados[vizinho] = 1;
+                fila[fimFila++] = vizinho;
+            }
+            adjacente = adjacente->prox;
+        }
+    }
+
+    free(fila);
+    free(visitados);
+}
 
 int main() {
-    Graph* grafo = criarGrafo(9);
+    Graph* grafo = criarGrafo(10);
 
-    adicionarAresta(grafo, 0, 1, 4);
-    adicionarAresta(grafo, 0, 8, 8);
-    adicionarAresta(grafo, 1, 8, 11);
-    adicionarAresta(grafo, 1, 3, 8);
-    adicionarAresta(grafo, 8, 9, 7);
-    adicionarAresta(grafo, 8, 7, 1);
-    adicionarAresta(grafo, 9, 3, 2);
-    adicionarAresta(grafo, 9, 7, 6);
-    adicionarAresta(grafo, 7, 6, 2);
-    adicionarAresta(grafo, 3, 6, 4);
-    adicionarAresta(grafo, 3, 4, 7);
-    adicionarAresta(grafo, 4, 6, 14);
-    adicionarAresta(grafo, 4, 5, 9);
-    adicionarAresta(grafo, 6, 5, 10);
+    Edge arestas[] = {
+        {0, 1, 4}, {0, 8, 8}, {1, 8, 11}, {1, 3, 8}, {8, 9, 7},
+        {8, 7, 1}, {9, 3, 2}, {9, 7, 6}, {7, 6, 2}, {3, 6, 4},
+        {3, 4, 7}, {4, 6, 14}, {4, 5, 9}, {6, 5, 10}
+    };
 
+    int numArestas = sizeof(arestas) / sizeof(arestas[0]);
+    for (int i = 0; i < numArestas; i++) {
+        adicionarAresta(grafo, arestas[i]);
+    }
 
     imprimirGrafo(grafo);
     imprimirGrafoComoMatriz(grafo);
+
+    buscaPorAmplitude(grafo, 0);
 
     return 0;
 }
