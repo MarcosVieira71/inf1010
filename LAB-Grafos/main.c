@@ -180,12 +180,12 @@ void kruskal(Edge* arestas, int totalArestas, int numVertices) {
 
 
 int main() {
-    Graph* grafo = criarGrafo(10);
+    Graph* grafo = criarGrafo(9);
 
     Edge arestas[] = {
-        {0, 1, 4}, {0, 8, 8}, {1, 8, 11}, {1, 3, 8}, {8, 9, 7},
-        {8, 7, 1}, {9, 3, 2}, {9, 7, 6}, {7, 6, 2}, {3, 6, 4},
-        {3, 4, 7}, {4, 6, 14}, {4, 5, 9}, {6, 5, 10}
+        {0, 1, 4}, {0, 8, 8}, {1, 8, 11}, {1, 3, 8}, {8, 2, 7},
+        {8, 7, 1}, {2, 3, 2}, {2, 7, 6}, {7, 6, 2}, {3, 6, 4},
+        {3, 4, 7}, {4, 6, 14}, {4, 5, 2}, {6, 5, 10}
     };
 
     int numArestas = sizeof(arestas) / sizeof(arestas[0]);
